@@ -1,9 +1,9 @@
 import {Command, flags} from '@oclif/command'
 import LookerClient, { ILookerFolder } from '../client/client'
 import ora from 'ora'
-import { createCanvas, loadImage, NodeCanvasRenderingContext2D } from 'canvas'
-import fs from 'fs'
 import open from 'open'
+import nodeHtmlToImage from 'node-html-to-image'
+import Handlebars from 'handlebars'
 
 export default class Listing extends Command {
   static description = 'Lists the content of the selected folder and its subfolders'
@@ -89,18 +89,35 @@ export default class Listing extends Command {
         if(flags.image){
           const spinner_image_export  = ora(`Exporting the image in the current folder ${process.cwd()}`).start()
           try {
-            const canvas = createCanvas(200,200)
-            const canvas_context = canvas.getContext("2d")
-            canvas_context.font = `${Listing.font_size.toString()}px Arial`
-            canvas_context.textAlign = 'left'
-            const { width, lines } = this.getCanvasSize(folder_org, parseInt(flags.depth), 0, 0, canvas_context)
-            canvas_context.canvas.width = width + 2 * Listing.font_size
-            canvas_context.canvas.height = Listing.font_size * (lines + 2) 
-            canvas_context.font = `${Listing.font_size.toString()}px Arial`
-            this.writeListingInCanvas(folder_org, parseInt(flags.depth), 0, canvas_context, flags.base_url)
-            const buffer = canvas.toBuffer()
             const filename = `${process.cwd()}/binocle_ls_${args.folder_id}_${Date.now()}.png`
-            fs.writeFileSync(filename, buffer)
+            Handlebars.registerPartial('child',
+            `📁 {{name}} #{{id}} (D:{{dashboards}} - L:{{looks}})
+            <div>
+              {{#each children}}
+                {{> child}}
+              {{/each}}
+            </div>`)
+            await nodeHtmlToImage({
+              output: filename,
+              html: `
+              <html>
+                <head>
+                  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+                  <style>body { padding: 15px; }</style>
+                  <style>div { border-left: 1px solid black; padding-left: 10px; }</style>
+              </head>
+              <body>
+                  📁 {{name}} #{{id}} (D:{{dashboards}} - L:{{looks}})
+                  <div>
+                  {{#each children}}
+                    {{> child}}
+                  {{/each}}
+                  </div>
+              </body>
+              </html>`,
+              content: folder_org,
+              transparent: true
+            })
             spinner_image_export.succeed(`Image exported as ${filename}`)
             await open(filename)
           }
@@ -150,31 +167,6 @@ export default class Listing extends Command {
     for (const child of org.children){
       this.printListing(child, max_depth, base_url)
     }
-  }
-
-  public getCanvasSize(org: IFolderOrganisation, max_depth: number, width: number, lines: number , canvas_context: NodeCanvasRenderingContext2D){
-    const line_width = canvas_context.measureText(`${"|   ".repeat(org.depth)}📁 ${org.name} #${org.id} ${org.depth ===  max_depth ? '' : ` (D:${org.dashboards} - L:${org.looks})`}`).width
-    let max_width = line_width>width ? line_width : width
-    let total_lines = lines + 1
-    for (const child of org.children){
-      const {width: new_width, lines: new_lines} = this.getCanvasSize(child, max_depth, max_width, total_lines, canvas_context)
-      max_width = new_width
-      total_lines = new_lines
-    }
-    return { width : max_width, lines : total_lines}
-  }
-
-  public writeListingInCanvas(org: IFolderOrganisation, max_depth: number, line: number, canvas_context: NodeCanvasRenderingContext2D, base_url: string){
-    let new_line = line + 1
-    canvas_context.fillText(
-      `${"|   ".repeat(org.depth)}📁 ${org.name} #${org.id} ${org.depth ===  max_depth ? '' : ` (D:${org.dashboards} - L:${org.looks})`}`,
-      Listing.font_size,
-      Listing.font_size * (new_line + 1),
-    )
-    for (const child of org.children){
-      new_line = this.writeListingInCanvas(child, max_depth, new_line, canvas_context, base_url)
-    }
-    return new_line
   }
 
   public static contentLinkFromId(base_url: string,id: string, type: looker_content){
