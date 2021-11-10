@@ -63,13 +63,13 @@ export default class Listing extends Command {
       client_secret: flags.client_secret,
       base_url: flags.base_url,
     })
-    var link_url=flags.base_url.match(/([a-z0-9:\/.]+):[0-9]+/g)
+
     await this.client.auth()
     const spinner_main_folder = ora(`Searching for folder ${args.folder_id}`).start()
     var main_folder: ILookerFolder
     try {
       main_folder = await this.client.getFolder(args.folder_id)
-      spinner_main_folder.succeed(`Folder ${`#\x1B]8;;${link_url}/folders/${args.folder_id}\x1B\\${args.folder_id}\x1B]8;;\x1B\\`} (${main_folder.name}) found`)
+      spinner_main_folder.succeed(`Folder ${Listing.contentLinkFromId(args.folder_id,'folder')} (${main_folder.name}) found`)
       var folder_org: IFolderOrganisation = {
         children: [],
         dashboards: main_folder.dashboards.length,
@@ -82,12 +82,11 @@ export default class Listing extends Command {
       try {
         await this.getSubFolders(args.folder_id,1,parseInt(flags.depth),folder_org.children)
         spinner_subfolders.succeed(`Subfolders found`)
-        if(link_url && link_url?.length>0){
-          this.printListing(folder_org, parseInt(flags.depth),link_url[0] ?? '')
+        if(flags.image){
+          const spinner_image_export  = ora(`Exporting the image in the current folder ${process.cwd()}`).start()
+          spinner_image_export.succeed(`Image exported as ${process.cwd()}/binocle_ls_${args.folder_id}_${Date.now()}.png`)
         }
-        else {
-          this.printListing(folder_org, parseInt(flags.depth))
-        }
+        this.printListing(folder_org, parseInt(flags.depth),flags.base_url)
       }
       catch(e) {
         spinner_subfolders.fail()
@@ -123,11 +122,15 @@ export default class Listing extends Command {
     }
   }
 
-  public printListing(org: IFolderOrganisation, max_depth: number, link_url?: string){
-    this.log(`${"|   ".repeat(org.depth)}📁 ${org.name} ${`#\x1B]8;;${link_url}/folders/${org.id}\x1B\\${org.id}\x1B]8;;\x1B\\`} ${org.depth ===  max_depth ? '' : ` (D:${org.dashboards} - L:${org.looks})`}`)
+  public printListing(org: IFolderOrganisation, max_depth: number, link_url: string){
+    this.log(`${"|   ".repeat(org.depth)}📁 ${org.name} ${Listing.contentLinkFromId(org.id,'folder')} ${org.depth ===  max_depth ? '' : ` (D:${org.dashboards} - L:${org.looks})`}`)
     for (const child of org.children){
       this.printListing(child, max_depth,link_url)
     }
+  }
+
+  public static contentLinkFromId(id: string, type: looker_content){
+    return `\x1B]8;;${this.flags.base_url}/${type}s/${id}\x1B\\#${id}\x1B]8;;\x1B\\`
   }
 
   private client!: LookerClient
@@ -141,3 +144,5 @@ export interface IFolderOrganisation {
   looks: number
   name: string
 }
+
+export type looker_content = 'folder' | 'look' | 'dashboard'
