@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "oclif-typescript",
+    "oclif",
+    "plugin:import/errors",
+    "plugin:import/warnings"
+  ],
+  "plugins": [
+    "promise",
+    "sort-class-members",
+    "sort-destructure-keys"
+  ],
+}

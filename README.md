@@ -1,1 +1,76 @@
 binocle
+=======
+
+Brilliant Instance Navigation, Organisation and Cleaning Looker Executable
+
+[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
+[![Version](https://img.shields.io/npm/v/binocle.svg)](https://npmjs.org/package/binocle)
+[![Downloads/week](https://img.shields.io/npm/dw/binocle.svg)](https://npmjs.org/package/binocle)
+[![License](https://img.shields.io/npm/l/binocle.svg)](https://github.com/rthoyer/binocle/blob/master/package.json)
+
+<!-- toc -->
+* [Usage](#usage)
+* [Commands](#commands)
+<!-- tocstop -->
+# Usage
+<!-- usage -->
+```sh-session
+$ npm install -g binocle
+$ binocle COMMAND
+running command...
+$ binocle (-v|--version|version)
+binocle/0.0.0 darwin-x64 node-v12.20.1
+$ binocle --help [COMMAND]
+USAGE
+  $ binocle COMMAND
+...
+```
+<!-- usagestop -->
+# Commands
+<!-- commands -->
+* [`binocle help [COMMAND]`](#binocle-help-command)
+* [`binocle ls [FOLDER_ID]`](#binocle-ls-folder_id)
+
+## `binocle help [COMMAND]`
+
+display help for binocle
+
+```
+USAGE
+  $ binocle help [COMMAND]
+
+ARGUMENTS
+  COMMAND  command to show help for
+
+OPTIONS
+  --all  see all commands in CLI
+```
+
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.4/src/commands/help.ts)_
+
+## `binocle ls [FOLDER_ID]`
+
+Lists the content of the selected folder and its subfolders
+
+```
+USAGE
+  $ binocle ls [FOLDER_ID]
+
+OPTIONS
+  -c, --client_id=client_id          (required) API3 credential client_id
+  -d, --depth=depth                  [default: 2] Sets the subfolders depth to display. Unlimited depth : -1
+  -h, --help                         show CLI help
+  -i, --image                        Creates an image of the listing in the current directory
+  -s, --client_secret=client_secret  (required) API3 credential client_id
+  -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
+
+EXAMPLE
+  $ binocle ls 123 -d 2
+  📁 Folder A #123 (D:0 - L:0)
+  |   📁 Folder B #145 (D:0 - L:2)
+  |   |   📁 Folder D #547 (D:0 - L:3)
+  |   📁 Folder C #156 (D:1 - L:7)
+```
+
+_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.0.0/src/commands/ls.ts)_
+<!-- commandsstop -->

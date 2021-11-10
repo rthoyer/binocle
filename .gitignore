@@ -1,0 +1,7 @@
+*-debug.log
+*-error.log
+.vscode/settings.json
+/dist
+/lib
+/tmp
+node_modules
