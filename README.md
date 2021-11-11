@@ -63,6 +63,7 @@ OPTIONS
   -i, --image                        Creates an image of the listing in the current directory
   -s, --client_secret=client_secret  (required) API3 credential client_id
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
+  --show_content                     Displays Looks and Dashboards in the listing
 
 EXAMPLE
   $ binocle ls 123 -d 2
