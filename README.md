@@ -19,7 +19,7 @@ $ npm install -g binocle
 $ binocle COMMAND
 running command...
 $ binocle (-v|--version|version)
-binocle/0.0.0 darwin-x64 node-v12.20.1
+binocle/0.0.1 darwin-x64 node-v12.20.1
 $ binocle --help [COMMAND]
 USAGE
   $ binocle COMMAND
@@ -73,5 +73,5 @@ EXAMPLE
   |   📁 Folder C #156 (D:1 - L:7)
 ```
 
-_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.0.0/src/commands/ls.ts)_
+_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.0.1/src/commands/ls.ts)_
 <!-- commandsstop -->
