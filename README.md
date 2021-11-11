@@ -34,7 +34,6 @@ USAGE
 # Commands
 <!-- commands -->
 * [`binocle help [COMMAND]`](#binocle-help-command)
-* [`binocle is-deleted [FOLDER_ID]`](#binocle-is-deleted-folder_id)
 * [`binocle ls [FOLDER_ID]`](#binocle-ls-folder_id)
 
 ## `binocle help [COMMAND]`
@@ -53,29 +52,6 @@ OPTIONS
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.4/src/commands/help.ts)_
-
-## `binocle is-deleted [FOLDER_ID]`
-
-Checks if a look was deleted by id and enables you to restore it if possible.
-
-```
-USAGE
-  $ binocle is-deleted [FOLDER_ID]
-
-OPTIONS
-  -c, --client_id=client_id          (required) API3 credential client_id
-  -d, --depth=depth                  [default: 2] Sets the subfolders depth to display. Unlimited depth : -1
-  -h, --help                         show CLI help
-  -i, --image                        Creates an image of the listing in the current directory
-  -s, --client_secret=client_secret  (required) API3 credential client_id
-  -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
-  --show_content                     Displays Looks and Dashboards in the listing
-
-EXAMPLE
-  $ binocle is-deleted 123
-```
-
-_See code: [src/commands/is-deleted.ts](https://github.com/rthoyer/binocle/blob/v0.0.3/src/commands/is-deleted.ts)_
 
 ## `binocle ls [FOLDER_ID]`
 
