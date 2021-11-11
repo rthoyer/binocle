@@ -21,7 +21,7 @@ export class LookerClient {
 
   public readonly account: ILookerAccount
 
-  public async auth(): Promise<ILookerAuth | undefined> {
+  public async auth(): Promise<ILookerAuth | any> {
     const spinner_auth = ora('Looker Authentication').start()
     try {
       const {data} = await this.agent.post<ILookerAuth>(`${this.account.base_url}/api/4.0/login?${stringify({

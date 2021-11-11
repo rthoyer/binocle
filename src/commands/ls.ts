@@ -50,6 +50,10 @@ export default class Listing extends Command {
       default: '2',
       description: 'Sets the subfolders depth to display. Unlimited depth : -1',
     }),
+    show_content: flags.boolean({
+      default: false,
+      description: 'Displays Looks and Dashboards in the listing',
+    }),
   }
 
   static args = [
@@ -77,14 +81,16 @@ export default class Listing extends Command {
       var folder_org: IFolderOrganisation = {
         children: [],
         dashboards: main_folder.dashboards.length,
+        dashboards_array: main_folder.dashboards.map((dashboard) => ({name : dashboard.title, id: dashboard.id.toString()})),
         depth: 0,
         id: main_folder.id, 
         looks: main_folder.looks.length,
+        looks_array: main_folder.looks.map((look) => ({name : look.title, id: look.id.toString()})),
         name: main_folder.name,
       }
       const spinner_subfolders = ora(`Searching for subfolders`).start()
       try {
-        await this.getSubFolders(args.folder_id,1,parseInt(flags.depth),folder_org.children)
+        await this.getSubFolders(args.folder_id,1,parseInt(flags.depth),folder_org.children, flags.show_content)
         spinner_subfolders.succeed(`Subfolders found`)
         if(flags.image){
           const spinner_image_export  = ora(`Exporting the image in the current folder ${process.cwd()}`).start()
@@ -139,7 +145,7 @@ export default class Listing extends Command {
     }
   }
 
-  public async getSubFolders(folder_id: string, depth: number, max_depth: number, org: IFolderOrganisation[]): Promise<void>{
+  public async getSubFolders(folder_id: string, depth: number, max_depth: number, org: IFolderOrganisation[], fetch_content: boolean): Promise<void>{
     var page = 1
     var children = await this.client.getFolderChildren(folder_id, {page: page, per_page: Listing.page_limit})
     while (children.length == page*Listing.page_limit){
@@ -149,7 +155,7 @@ export default class Listing extends Command {
     for (const child of children){
       var grandchildren: IFolderOrganisation[] = []
       if(depth + 1 <= max_depth || max_depth === -1){
-        await this.getSubFolders(child.id, depth + 1, max_depth, grandchildren)
+        await this.getSubFolders(child.id, depth + 1, max_depth, grandchildren, fetch_content)
       }
       org.push({
         children: grandchildren,
@@ -179,10 +185,17 @@ export default class Listing extends Command {
 export interface IFolderOrganisation {
   children: IFolderOrganisation[]
   dashboards: number
+  dashboards_array?: IContentInfos[]
   depth: number
   id: string
   looks: number
+  looks_array?: IContentInfos[]
   name: string
 }
 
 export type looker_content = 'folder' | 'look' | 'dashboard'
+
+export interface IContentInfos {
+  name: string
+  id: string
+}
