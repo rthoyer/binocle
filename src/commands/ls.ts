@@ -167,15 +167,15 @@ export default class Listing extends Command {
       children.push(...await this.client.getFolderChildren(folder_id, {page: page, per_page: Listing.page_limit}))
     }
     for (const child of children){
-      var grandchildren: IFolderOrganisation[] = []
+      const grandchildren: IFolderOrganisation[] = []
+      const content: IContent = {}
       if(depth + 1 <= max_depth || max_depth === -1){
         await this.getSubFolders(child.id, depth + 1, max_depth, grandchildren, fetch_content)
-      }
-      const content: IContent = {}
-      if (fetch_content){
-        var current_folder = await this.client.getFolder(folder_id)
-        content.looks_array = current_folder.looks.map((look) => ({name : look.title, id: look.id.toString()}))
-        content.dashboards_array = current_folder.dashboards.map((dashboard) => ({name : dashboard.title, id: dashboard.id.toString()}))
+        if (fetch_content){
+          var current_folder = await this.client.getFolder(folder_id)
+          content.looks_array = current_folder.looks.map((look) => ({name : look.title, id: look.id.toString()}))
+          content.dashboards_array = current_folder.dashboards.map((dashboard) => ({name : dashboard.title, id: dashboard.id.toString()}))
+        }
       }
       org.push({
         children: grandchildren,
