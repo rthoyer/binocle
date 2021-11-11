@@ -88,41 +88,54 @@ export default class Listing extends Command {
         looks_array: main_folder.looks.map((look) => ({name : look.title, id: look.id.toString()})),
         name: main_folder.name,
       }
-      const spinner_subfolders = ora(`Searching for subfolders`).start()
+      const spinner_subfolders = ora('Searching for subfolders'.concat(flags.show_content ? ' and content' : '')).start()
       try {
         await this.getSubFolders(args.folder_id,1,parseInt(flags.depth),folder_org.children, flags.show_content)
-        spinner_subfolders.succeed(`Subfolders found`)
+        spinner_subfolders.succeed(`Found subfolders`.concat(flags.show_content ? ' and content' : ''))
         if(flags.image){
           const spinner_image_export  = ora(`Exporting the image in the current folder ${process.cwd()}`).start()
           try {
             const filename = `${process.cwd()}/binocle_ls_${args.folder_id}_${Date.now()}.png`
             Handlebars.registerPartial('child',
-            `📁 {{name}} #{{id}} (D:{{dashboards}} - L:{{looks}})
-            <div>
-              {{#each children}}
-                {{> child}}
-              {{/each}}
-            </div>`)
+              `📁 {{name}} #{{id}} (D:{{dashboards}} - L:{{looks}})
+              <div>
+                {{#each children}}
+                  {{> child}}
+                {{/each}}
+                {{#each dashboards_array}}
+                  📊 {{name}} #{{id}}</br>
+                {{/each}}
+                {{#each looks_array}}
+                  👁 {{name}} #{{id}}</br>
+                {{/each}}
+              </div>`)
             await nodeHtmlToImage({
               output: filename,
               html: `
-              <html>
-                <head>
-                  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
-                  <style>body { padding: 15px; }</style>
-                  <style>div { border-left: 1px solid black; padding-left: 10px; }</style>
-              </head>
-              <body>
-                  📁 {{name}} #{{id}} (D:{{dashboards}} - L:{{looks}})
-                  <div>
-                  {{#each children}}
-                    {{> child}}
-                  {{/each}}
-                  </div>
-              </body>
-              </html>`,
+                <html>
+                  <head>
+                    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+                    <style>body { padding: 15px; }</style>
+                    <style>div { border-left: 1px solid black; padding-left: 10px; }</style>
+                </head>
+                <body>
+                    📁 {{name}} #{{id}} (D:{{dashboards}} - L:{{looks}})
+                    <div>
+                    {{#each children}}
+                      {{> child}}
+                    {{/each}}
+                    {{#each dashboards_array}}
+                      📊 {{name}} #{{id}}</br>
+                    {{/each}}
+                    {{#each looks_array}}
+                      👁 {{name}} #{{id}}</br>
+                    {{/each}}
+                    </div>
+                </body>
+                </html>`,
               content: folder_org,
-              transparent: true
+              transparent: true,
+              type: 'png'
             })
             spinner_image_export.succeed(`Image exported as ${filename}`)
             await open(filename)
