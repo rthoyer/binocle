@@ -1,7 +1,6 @@
 import axios, {AxiosResponse, AxiosInstance} from 'axios'
-import debug from 'debug'
 import https from 'https'
-import {stringify} from 'qs'
+import { stringify } from 'qs'
 import ora from 'ora'
 
 export class LookerClient {
