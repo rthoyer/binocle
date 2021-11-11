@@ -48,12 +48,32 @@ export class LookerClient {
   }
 
   public async getLook(id: string): Promise<ILookerLookWithQuery> {
-    const { data } = await this.agent.get<ILookerLookWithQuery>(`${this.account.base_url}/api/4.0/look/${id}`)
+    const { data } = await this.agent.get<ILookerLookWithQuery>(`${this.account.base_url}/api/4.0/looks/${id}`)
+    return data
+  }
+
+  public async updateLook(id: string, opts: object): Promise<ILookerLookWithQuery> {
+    const { data } = await this.agent.patch<ILookerLookWithQuery>(`${this.account.base_url}/api/4.0/looks/${id}?${stringify(opts)}`,opts)
+    return data
+  }
+
+  public async moveLook(opts: ILookMovementOptions): Promise<ILookerLookWithQuery> {
+    const { data } = await this.agent.patch<ILookerLookWithQuery>(`${this.account.base_url}/api/4.0/looks/${opts.look_id}/move?${stringify(opts)}`,opts)
     return data
   }
 
   public async getDashboard(id: string): Promise<ILookerDashboard> {
-    const { data } = await this.agent.get<ILookerDashboard>(`${this.account.base_url}/api/4.0/look/${id}`)
+    const { data } = await this.agent.get<ILookerDashboard>(`${this.account.base_url}/api/4.0/dashboards/${id}`)
+    return data
+  }
+
+  public async updateDashboard(id: string, opts: object): Promise<ILookerDashboard> {
+    const { data } = await this.agent.patch<ILookerDashboard>(`${this.account.base_url}/api/4.0/dashboards/${id}?${stringify(opts)}`,opts)
+    return data
+  }
+
+  public async moveDashboard(opts: IDashboardMovementOptions): Promise<ILookerDashboard> {
+    const { data } = await this.agent.patch<ILookerDashboard>(`${this.account.base_url}/api/4.0/dashboards/${opts.dashboard_id}/move?${stringify(opts)}`,opts)
     return data
   }
 }
@@ -68,6 +88,16 @@ export interface ILookerAuth {
   access_token: string
   expires_in: number
   token_type: string
+}
+
+export interface ILookMovementOptions {
+  look_id: string
+  folder_id: string
+}
+
+export interface IDashboardMovementOptions {
+  dashboard_id: string
+  folder_id: string
 }
 
 export interface ILookerFolder {

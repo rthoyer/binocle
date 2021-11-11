@@ -35,6 +35,7 @@ USAGE
 <!-- commands -->
 * [`binocle help [COMMAND]`](#binocle-help-command)
 * [`binocle ls [FOLDER_ID]`](#binocle-ls-folder_id)
+* [`binocle restore ID [TYPE]`](#binocle-restore-id-type)
 
 ## `binocle help [COMMAND]`
 
@@ -84,4 +85,25 @@ EXAMPLE
 ```
 
 _See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.0.3/src/commands/ls.ts)_
+
+## `binocle restore ID [TYPE]`
+
+Check if a look or dashboard has been deleted by id and restore it if possible.
+
+```
+USAGE
+  $ binocle restore ID [TYPE]
+
+ARGUMENTS
+  ID
+  TYPE  (l|d) [default: l] look (l) or dashboard (d)
+
+OPTIONS
+  -c, --client_id=client_id          (required) API3 credential client_id
+  -h, --help                         show CLI help
+  -s, --client_secret=client_secret  (required) API3 credential client_id
+  -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
+```
+
+_See code: [src/commands/restore.ts](https://github.com/rthoyer/binocle/blob/v0.0.3/src/commands/restore.ts)_
 <!-- commandsstop -->
