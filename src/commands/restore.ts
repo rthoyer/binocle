@@ -4,7 +4,7 @@ import LookerClient from '../client/client'
 import inquirer from 'inquirer'
 
 export default class Restore extends Command {
-  static description = 'Check if a look or dashboard has been deleted by id and restore it if possible.'
+  static description = 'Check if a look or dashboard has been deleted by id and restore it if possible in a chosen folder.'
 
   static flags = {
     base_url: flags.string({

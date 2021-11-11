@@ -172,9 +172,9 @@ export default class Listing extends Command {
       if(depth + 1 <= max_depth || max_depth === -1){
         await this.getSubFolders(child.id, depth + 1, max_depth, grandchildren, fetch_content)
         if (fetch_content){
-          var current_folder = await this.client.getFolder(folder_id)
-          content.looks_array = current_folder.looks.map((look) => ({name : look.title, id: look.id.toString()}))
-          content.dashboards_array = current_folder.dashboards.map((dashboard) => ({name : dashboard.title, id: dashboard.id.toString()}))
+          var child_folder = await this.client.getFolder(child.id)
+          content.looks_array = child_folder.looks.map((look) => ({name : look.title, id: look.id.toString()}))
+          content.dashboards_array = child_folder.dashboards.map((dashboard) => ({name : dashboard.title, id: dashboard.id.toString()}))
         }
       }
       org.push({
