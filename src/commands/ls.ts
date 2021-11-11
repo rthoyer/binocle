@@ -132,7 +132,7 @@ export default class Listing extends Command {
             console.error(e)
           }
         }
-        this.printListing(folder_org, parseInt(flags.depth),flags.base_url)
+        this.printListing(folder_org, parseInt(flags.depth),flags.base_url, flags.show_content)
       }
       catch(e) {
         spinner_subfolders.fail()
@@ -157,6 +157,12 @@ export default class Listing extends Command {
       if(depth + 1 <= max_depth || max_depth === -1){
         await this.getSubFolders(child.id, depth + 1, max_depth, grandchildren, fetch_content)
       }
+      const content: IContent = {}
+      if (fetch_content){
+        var current_folder = await this.client.getFolder(folder_id)
+        content.looks_array = current_folder.looks.map((look) => ({name : look.title, id: look.id.toString()}))
+        content.dashboards_array = current_folder.dashboards.map((dashboard) => ({name : dashboard.title, id: dashboard.id.toString()}))
+      }
       org.push({
         children: grandchildren,
         dashboards: child.dashboards.length,
@@ -164,14 +170,23 @@ export default class Listing extends Command {
         id: child.id,
         looks: child.looks.length,
         name: child.name,
+        ...content
       })
     }
   }
 
-  public printListing(org: IFolderOrganisation, max_depth: number, base_url: string){
+  public printListing(org: IFolderOrganisation, max_depth: number, base_url: string, fetch_content: boolean){
     this.log(`${"|   ".repeat(org.depth)}📁 ${org.name} ${Listing.contentLinkFromId(base_url,org.id,'folder')} ${org.depth ===  max_depth ? '' : ` (D:${org.dashboards} - L:${org.looks})`}`)
     for (const child of org.children){
-      this.printListing(child, max_depth, base_url)
+      this.printListing(child, max_depth, base_url, fetch_content)
+    }
+    if (fetch_content && org.looks_array && org.dashboards_array && org.depth !==  max_depth){
+      for (const dashboard of org.dashboards_array){
+        this.log(`${"|   ".repeat(org.depth + 1)}📊 ${dashboard.name} ${Listing.contentLinkFromId(base_url,dashboard.id,'dashboard')}`)
+      }
+      for (const look of org.looks_array){
+        this.log(`${"|   ".repeat(org.depth + 1)}👁  ${look.name} ${Listing.contentLinkFromId(base_url,look.id,'look')}`)
+      }
     }
   }
 
@@ -191,6 +206,11 @@ export interface IFolderOrganisation {
   looks: number
   looks_array?: IContentInfos[]
   name: string
+}
+
+export interface IContent {
+  dashboards_array?: IContentInfos[]
+  looks_array?: IContentInfos[]
 }
 
 export type looker_content = 'folder' | 'look' | 'dashboard'
