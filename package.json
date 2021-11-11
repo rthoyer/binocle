@@ -1,7 +1,7 @@
 {
   "name": "binocle",
   "description": "Brilliant Instance Navigation, Organisation and Cleaning Looker Executable",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Romain Thoyer",
   "bin": {
     "binocle": "./bin/run"

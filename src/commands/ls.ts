@@ -6,7 +6,8 @@ import nodeHtmlToImage from 'node-html-to-image'
 import Handlebars from 'handlebars'
 
 export default class Listing extends Command {
-  static description = 'Lists the content of the selected folder and its subfolders'
+  static description = `Lists the content of the selected folder and its subfolders.
+  Use the options to save the output to a png image, display the looks and dashboards and set the depth in the folder binocle must search in. Click on the contents and folders ids in your terminal (provided it supports it, use iTerm2 for instance) to open them in your default browser.`
   static examples = [
     `$ binocle ls 123 -d 2
 📁 Folder A #123 (D:0 - L:0)

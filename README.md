@@ -8,6 +8,11 @@ Brilliant Instance Navigation, Organisation and Cleaning Looker Executable
 [![Downloads/week](https://img.shields.io/npm/dw/binocle.svg)](https://npmjs.org/package/binocle)
 [![License](https://img.shields.io/npm/l/binocle.svg)](https://github.com/rthoyer/binocle/blob/master/package.json)
 
+This CLI tool was developed furing the Hack@Home 2021 Hackathon organized by Looker.  
+It uses the environement variables described in the [Looker Codegen SDK](https://github.com/looker-open-source/sdk-codegen#environment-variable-configuration).
+
+It aims at providing a set of tools to better understand, organise and document your Looker instance.
+
 <!-- toc -->
 * [Usage](#usage)
 * [Commands](#commands)
@@ -19,7 +24,7 @@ $ npm install -g binocle
 $ binocle COMMAND
 running command...
 $ binocle (-v|--version|version)
-binocle/0.0.1 darwin-x64 node-v12.20.1
+binocle/0.0.2 darwin-x64 node-v12.20.1
 $ binocle --help [COMMAND]
 USAGE
   $ binocle COMMAND
@@ -50,7 +55,7 @@ _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.4
 
 ## `binocle ls [FOLDER_ID]`
 
-Lists the content of the selected folder and its subfolders
+Lists the content of the selected folder and its subfolders.
 
 ```
 USAGE
@@ -65,6 +70,11 @@ OPTIONS
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
   --show_content                     Displays Looks and Dashboards in the listing
 
+DESCRIPTION
+  Use the options to save the output to a png image, display the looks and dashboards and set the depth in the folder 
+  binocle must search in. Click on the contents and folders ids in your terminal (provided it supports it, use iTerm2 
+  for instance) to open them in your default browser.
+
 EXAMPLE
   $ binocle ls 123 -d 2
   📁 Folder A #123 (D:0 - L:0)
@@ -73,5 +83,5 @@ EXAMPLE
   |   📁 Folder C #156 (D:1 - L:7)
 ```
 
-_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.0.1/src/commands/ls.ts)_
+_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.0.2/src/commands/ls.ts)_
 <!-- commandsstop -->
