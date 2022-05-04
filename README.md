@@ -8,7 +8,7 @@ Brilliant Instance Navigation, Organisation and Cleaning Looker Executable
 [![Downloads/week](https://img.shields.io/npm/dw/binocle.svg)](https://npmjs.org/package/binocle)
 [![License](https://img.shields.io/npm/l/binocle.svg)](https://github.com/rthoyer/binocle/blob/master/package.json)
 
-This CLI tool was developed furing the Hack@Home 2021 Hackathon organized by Looker.  
+This CLI tool was initially developed during the Hack@Home 2021 Hackathon organized by Looker.  
 It uses the environement variables described in the [Looker Codegen SDK](https://github.com/looker-open-source/sdk-codegen#environment-variable-configuration).
 
 It aims at providing a set of tools to better understand, organise and document your Looker instance.
