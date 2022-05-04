@@ -76,6 +76,21 @@ export class LookerClient {
     const { data } = await this.agent.patch<ILookerDashboard>(`${this.account.base_url}/api/4.0/dashboards/${opts.dashboard_id}/move?${stringify(opts)}`,opts)
     return data
   }
+
+  public async getScheduledPlansForLook(id: string, opts: object): Promise<ILookerScheduledPlan[]> {
+    const { data } = await this.agent.get<ILookerScheduledPlan[]>(`${this.account.base_url}/api/4.0/scheduled_plans/look/${id}?${stringify(opts)}`,opts)
+    return data
+  }
+
+  public async getScheduledPlansForDashboard(id: string, opts: object): Promise<ILookerScheduledPlan[]> {
+    const { data } = await this.agent.get<ILookerScheduledPlan[]>(`${this.account.base_url}/api/4.0/scheduled_plans/dashboard/${id}?${stringify(opts)}`,opts)
+    return data
+  }
+
+  public async updateScheduledPlan(id: number, opts: object): Promise<ILookerScheduledPlan[]> {
+    const { data } = await this.agent.patch<ILookerScheduledPlan[]>(`${this.account.base_url}/api/4.0/scheduled_plans/${id}`,opts)
+    return data
+  }
 }
 
 export interface ILookerAccount {
@@ -412,6 +427,57 @@ export interface ILookerFolderChildrenOptions {
   page?: number
   per_page?: number
   sorts?: string
+}
+
+export interface ILookerScheduledPlan {
+  can: object
+  color_theme?: string
+  created_at: Date
+  crontab: string
+  dashboard_filters?: string
+  dashboard_id?: number
+  datagroup?: string
+  embed?: boolean
+  enabled: boolean
+  filters_string ?: string
+  id: number
+  include_links: boolean
+  last_run_at: Date
+  long_tables?: boolean
+  look_id?: number
+  lookml_dashboard_id?: string
+  name?: string
+  next_run_at: Date
+  pdf_landscape?: boolean
+  pdf_paper_size?: string
+  prewarm_only?: boolean
+  query_id: string
+  require_change: boolean
+  require_no_results: boolean
+  require_results: boolean
+  run_as_recipient?: boolean
+  run_once: boolean
+  scheduled_plan_destination: ILookerScheduledPlanDestination[]
+  send_all_results: boolean
+  timezone: string
+  title?: string
+  updated_at: Date
+  user_id: number
+  user?: ILookerUserIdOnly
+}
+
+export interface ILookerScheduledPlanDestination {
+  address?: string
+  apply_formatting?: boolean
+  apply_vis?: boolean
+  format: string
+  id: number
+  looker_recipient?: boolean
+  message?: string
+  parameters?: string
+  scheduled_plan_id?: number
+  secret_parameters?: string
+  type?: string
 }
 
 export default LookerClient
