@@ -24,7 +24,7 @@ $ npm install -g binocle
 $ binocle COMMAND
 running command...
 $ binocle (-v|--version|version)
-binocle/0.1.1 darwin-x64 node-v12.20.1
+binocle/0.1.1 darwin-x64 node-v16.14.2
 $ binocle --help [COMMAND]
 USAGE
   $ binocle COMMAND
@@ -35,6 +35,7 @@ USAGE
 <!-- commands -->
 * [`binocle help [COMMAND]`](#binocle-help-command)
 * [`binocle ls [FOLDER_ID]`](#binocle-ls-folder_id)
+* [`binocle pause CONTENT_ID [TYPE] [USER_ID]`](#binocle-pause-content_id-type-user_id)
 * [`binocle restore ID [TYPE]`](#binocle-restore-id-type)
 
 ## `binocle help [COMMAND]`
@@ -52,7 +53,7 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.4/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.3.1/src/commands/help.ts)_
 
 ## `binocle ls [FOLDER_ID]`
 
@@ -85,6 +86,31 @@ EXAMPLE
 ```
 
 _See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.1.1/src/commands/ls.ts)_
+
+## `binocle pause CONTENT_ID [TYPE] [USER_ID]`
+
+Gets all schedules of a Look/Dashboard and enables pausing them.
+
+```
+USAGE
+  $ binocle pause CONTENT_ID [TYPE] [USER_ID]
+
+ARGUMENTS
+  CONTENT_ID
+  TYPE        (l|d) [default: l] look (l) or dashboard (d)
+  USER_ID     If no user_id is provided defaults to the API3 Key owner
+
+OPTIONS
+  -c, --client_id=client_id          (required) API3 credential client_id
+  -h, --help                         show CLI help
+  -s, --client_secret=client_secret  (required) API3 credential client_id
+  -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
+
+ALIASES
+  $ binocle schedule:pause
+```
+
+_See code: [src/commands/pause.ts](https://github.com/rthoyer/binocle/blob/v0.1.1/src/commands/pause.ts)_
 
 ## `binocle restore ID [TYPE]`
 
