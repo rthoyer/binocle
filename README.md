@@ -89,7 +89,7 @@ _See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.1.4/s
 
 ## `binocle pause CONTENT_ID [TYPE] [USER_ID]`
 
-Gets all schedules of a Look/Dashboard and enables pausing them.
+Gets all schedules of a Look/Dashboard and enables pausing/unpausing them. NB: if any runs were skipped while it was paused, it will run once after being unpaused.
 
 ```
 USAGE
@@ -103,6 +103,7 @@ ARGUMENTS
 OPTIONS
   -c, --client_id=client_id          (required) API3 credential client_id
   -h, --help                         show CLI help
+  -r, --revert                       Revert: displays paused schedules and enabling unpausing them
   -s, --client_secret=client_secret  (required) API3 credential client_id
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 
