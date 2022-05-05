@@ -4,7 +4,7 @@ import LookerClient, { ILookerScheduledPlan } from '../client/client'
 import inquirer from 'inquirer'
 
 export default class Pause extends Command {
-  static description = 'Gets all schedules of a Look/Dashboard and enables pausing them.'
+  static description = 'Gets all schedules of a Look/Dashboard and enables pausing/unpausing them. NB: if any runs were skipped while it was paused, it will run once after being unpaused.'
   static aliases = ['schedule:pause']
   static flags = {
     base_url: flags.string({
@@ -27,6 +27,11 @@ export default class Pause extends Command {
     }),
     help: flags.help({
       char: 'h',
+    }),
+    revert: flags.boolean({
+      char: 'r',
+      description: 'Revert: displays paused schedules and enabling unpausing them',
+      default: false
     }),
   }
 
@@ -83,29 +88,29 @@ export default class Pause extends Command {
       }
       return
     }
-    if(schedules.filter(schedule => schedule.enabled).length === 0){
-      this.log(`No enabled schedules for this content`)
+    if(schedules.filter(schedule => schedule.enabled !== flags.revert).length === 0){
+      this.log(`No ${flags.revert ? 'paused' : 'enabled'} schedules for this content`)
     }
     else {
       const choices: IScheduleChoice = await inquirer.prompt([{
         name: 'schedule_choices',
-        message: 'Which enabled schedule do you want to pause ?',
+        message: `Which ${flags.revert ? 'paused' : 'enabled'} schedule do you want to ${flags.revert ? 'un' : ''}pause ?`,
         type: 'checkbox',
         choices: schedules
-          .filter(schedule => schedule.enabled)
-          .map( schedule => ({value: schedule, name: `[Id: ${schedule.id}] [Name: ${schedule?.name}] [Title: ${schedule?.title}] [Crontab: ${schedule?.crontab}] [Type: ${JSON.stringify(schedule?.scheduled_plan_destination.map(dest => dest?.type).join())}] [Recipients: ${JSON.stringify(schedule?.scheduled_plan_destination.map(dest => dest?.address).join())}]`}))
+          .filter(schedule => schedule.enabled !== flags.revert)
+          .map( schedule => ({value: schedule, name: `[Status: ${schedule.enabled ? '✅' : '⏸'} ] [Id: ${schedule.id}] [Name: ${schedule?.name}] [Title: ${schedule?.title}] [Crontab: ${schedule?.crontab}] [Type: ${JSON.stringify(schedule?.scheduled_plan_destination.map(dest => dest?.type).join())}] [Recipients: ${JSON.stringify(schedule?.scheduled_plan_destination.map(dest => dest?.address).join())}]`}))
       }])
-      const spinner_pausing_schedule  = ora(`Pausing schedule`).start()
+      const spinner_pausing_schedule  = ora(`${flags.revert ? 'Unp' : 'P'}ausing schedule`).start()
       try {
         for (const schedule in choices.schedule_choices){
-          await this.client.updateScheduledPlan(choices.schedule_choices[schedule].id, {enabled: false})
-          spinner_pausing_schedule.stopAndPersist({text: `Paused schedule ${choices.schedule_choices[schedule].id}`})
+          const data = await this.client.updateScheduledPlan(choices.schedule_choices[schedule].id, {enabled: flags.revert})
+          spinner_pausing_schedule.stopAndPersist({text: `${flags.revert ? 'Unp' : 'P'}aused schedule ${choices.schedule_choices[schedule].id}`})
         }
-        spinner_pausing_schedule.succeed('Schedules paused')
+        spinner_pausing_schedule.succeed(`Schedules ${flags.revert ? 'un' : ''}paused`)
       }
       catch(e) {
         spinner_pausing_schedule.fail()
-        console.error('Failed to pause this schedule.')
+        console.error(`Failed to ${flags.revert ? 'un' : ''}pause this schedule.`)
         let show_get_error: IShowErrorChoice = await inquirer.prompt([{
           name: 'answer',
           message: 'Display full error response ?',
