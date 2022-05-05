@@ -24,7 +24,7 @@ $ npm install -g binocle
 $ binocle COMMAND
 running command...
 $ binocle (-v|--version|version)
-binocle/0.1.4 darwin-x64 node-v16.14.2
+binocle/0.1.5 darwin-x64 node-v16.14.2
 $ binocle --help [COMMAND]
 USAGE
   $ binocle COMMAND
@@ -85,7 +85,7 @@ EXAMPLE
   |   📁 Folder C #156 (D:1 - L:7)
 ```
 
-_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.1.4/src/commands/ls.ts)_
+_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.1.5/src/commands/ls.ts)_
 
 ## `binocle pause CONTENT_ID [TYPE] [USER_ID]`
 
@@ -111,7 +111,7 @@ ALIASES
   $ binocle schedule:pause
 ```
 
-_See code: [src/commands/pause.ts](https://github.com/rthoyer/binocle/blob/v0.1.4/src/commands/pause.ts)_
+_See code: [src/commands/pause.ts](https://github.com/rthoyer/binocle/blob/v0.1.5/src/commands/pause.ts)_
 
 ## `binocle restore ID [TYPE]`
 
@@ -132,5 +132,5 @@ OPTIONS
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 ```
 
-_See code: [src/commands/restore.ts](https://github.com/rthoyer/binocle/blob/v0.1.4/src/commands/restore.ts)_
+_See code: [src/commands/restore.ts](https://github.com/rthoyer/binocle/blob/v0.1.5/src/commands/restore.ts)_
 <!-- commandsstop -->
