@@ -1,6 +1,6 @@
 import {Command, flags} from '@oclif/command'
 import ora from 'ora'
-import LookerClient, { IDashboardElement, ILookerDashboard, ILookerQuery } from '../client/client'
+import LookerClient, { IDashboardElement, ILookerDashboard, ILookerLook, ILookerLookWithQuery, ILookerQuery } from '../client/client'
 import inquirer from 'inquirer'
 import { string } from '@oclif/parser/lib/flags'
 
@@ -78,7 +78,11 @@ export default class Edit extends Command {
     try {
       if (args.type === 'd'){
         this.dashboard = await this.client.getDashboard(args.id)
-        spinner_edit_content.succeed('Dashboard : ' + this.dashboard.title + ' found !')
+        spinner_edit_content.succeed('Dashboard : ' + this.dashboard.title + '(# ' +  this.dashboard.id + ') found !')
+      }
+      else {
+        this.look = await this.client.getLook(args.id)
+        spinner_edit_content.succeed('Dashboard : ' + this.look.title + '(# ' +  this.look.id + ') found !')
       }
     }
     catch(e) {
@@ -96,20 +100,32 @@ export default class Edit extends Command {
       return
     }
     if (this.dashboard) {
+      await this.editDashboard()
+    }
+  }
+  
+  
+  private client!: LookerClient
+  private dashboard ?: ILookerDashboard
+  private look ?: ILookerLookWithQuery
+
+  private async editDashboard() {
+    if (this.dashboard) {
+      const {args, flags} = this.parse(Edit)
       if (flags.rename) {
-        console.log(flags.rename)
         let ask_name_of_dashboard: IShowRename = await inquirer.prompt([{
           name: 'answer',
           message: 'Enter the new name of the copied Dashboard :',
           type: 'input',
         }])
+        const spinner_rename  = ora(`Editing Dashboard`).start()
         try{
           this.dashboard = await this.client.updateDashboard(this.dashboard.id, {title: ask_name_of_dashboard.answer})
         }
         catch(e) {
-          spinner_edit_content.fail()
-          console.error('Could not find resquested content. It may not exist.')
-          let show_get_error: IShowErrorChoice = await inquirer.prompt([{
+          spinner_rename.fail()
+          console.error('Could not rename resquested content. It may not exist.')
+          let show_get_error: IShowChoice = await inquirer.prompt([{
             name: 'error',
             message: 'Display full error response ?',
             type: 'list',
@@ -130,107 +146,86 @@ export default class Edit extends Command {
             .filter(dashboard_element => dashboard_element.title_text == null)
             .map( dashboard_element => ({value: dashboard_element, name: `[Name: ${dashboard_element.title} ] [Id: ${dashboard_element.id}]`}))
       }])
+      const spinner_editing  = ora(`Editing Dashboard`).start()
       if (flags.bulk) {
         if (flags.get_properties) {
-          console.log(choices.dashboard_element_choices)
+          let show_properties: IShowChoice = await inquirer.prompt([{
+            name: 'answer',
+            message: 'Would you want to see the properties of the first element ?',
+            type: 'list',
+            choices: [{name: 'yes'}, {name: 'no'}],
+          }])
+          console.dir(choices.dashboard_element_choices[0].query, { depth: null })
         }
         let ask_changes: IShowChanges = await inquirer.prompt([{
           name: 'answer',
           message: 'Enter the object containing the changes you want to apply on all Tiles selected :',
           type: 'input',
         }])
-        const spinner_editing  = ora(`Editing Dashboard`).start()
+        
         for (const element of choices.dashboard_element_choices) {
-          try {
-            await this.client.updateDashboardElement(element.id, JSON.parse(ask_changes.answer))
-          }
-          catch(e) {
-            spinner_editing.fail()
-            console.error('Could not edit the Dashboard elements.')
-            let show_get_error_edit: IShowErrorChoice = await inquirer.prompt([{
-              name: 'error_edit',
-              message: 'Display full error response ?',
-              type: 'list',
-              choices: [{name: 'yes'}, {name: 'no'}],
-            }])
-            if(show_get_error_edit.answer === 'yes'){
-              console.error(e)
-            }
-            return
-          }
+          await this.updateDashboardElement(element, ask_changes, spinner_editing)
         }
         spinner_editing.succeed('Your bulk has been updated !')
       }
       else {
         for (let element of choices.dashboard_element_choices) {
           if (flags.get_properties) {
-            console.dir(choices.dashboard_element_choices[0].query, { depth: null })
+            let show_properties: IShowChoice = await inquirer.prompt([{
+              name: 'answer',
+              message: 'Would you want to see the properties of all the elements ?',
+              type: 'list',
+              choices: [{name: 'yes'}, {name: 'no'}],
+            }])
+            console.dir(element.query, { depth: null })
           }
           let ask_changes: IShowChanges = await inquirer.prompt([{
             name: 'answer',
             message: 'Enter the object containing the changes you want to apply on all Tiles selected :',
             type: 'input',
           }])
-          const input_query = JSON.parse(ask_changes.answer)
-          let query: ILookerQuery = element.query
-            try {
-              // for (const key in input_query) {
-              //   if (typeof(query[key as keyof ILookerQuery]) == 'string') {
-              //     console.log("STRING");
-              //     (query[key as keyof ILookerQuery] as any) = input_query[key]
-              //   }
-              //   else if ((query[key as keyof ILookerQuery] as string[]).length > 0){
-              //     console.log("LEEEEEEEENGTH")
-              //     const array_elements = input_query[key] as string[]
-              //     for (let i = 0; i < (input_query[key] as string[]).length; i++) {
-              //       let test = true
-              //       if ((query[key as keyof ILookerQuery] as string[]).some((e: string)  => e == array_elements[i])){
-              //         (query[key as keyof ILookerQuery] as string[]) = (query[key as keyof ILookerQuery] as string[]).filter(e => e != array_elements[i])
-              //         test = false
-              //       }
-              //       if (test){
-              //         (query[key as keyof ILookerQuery] as string[]).push(array_elements[i])
-              //       }
-              //     }
-              //   }
-              //   else if(typeof(query[key as keyof ILookerQuery]) == 'object') {
-              //     console.log("OBJECT");
-              //     const value = Object.assign(query[key as keyof ILookerQuery], input_query[key]);
-              //     (query[key as keyof ILookerQuery] as any) = value
-              //   }   
-              // }
-              query = {...query, ...input_query, can: undefined,slug: undefined,share_url: undefined,expanded_share_url: undefined,url: undefined,has_table_calculations: undefined,client_id: undefined}
-                const new_query = await this.client.createQuery(query)
-               
-                throw new Error("CONNARD");
-                
-                await this.client.updateDashboardElement(element.id, {"query_id": new_query.id})
-            }
-            catch(e) {
-              const spinner_editing  = ora(`Couldn't Edit Dashboard`).fail()
-              let show_get_error_edit: IShowErrorChoice = await inquirer.prompt([{
-                name: 'answer',
-                message: 'Display full error response ?',
-                type: 'list',
-                choices: [{name: 'yes'}, {name: 'no'}],
-              }])
-              console.error(show_get_error_edit)
-              if(show_get_error_edit.answer === 'yes'){
-                console.error(e)
-              }
-              return
-            }
-          
-        }
-        const spinner_editing  = ora(`Your Dashboard has been edited !`).succeed()
+          await this.updateDashboardElement(element, ask_changes, spinner_editing)
+        } 
+        spinner_editing.succeed('Your Dashboard has been updated !')
       }
     }
   }
-  
-  
-  private client!: LookerClient
-  private dashboard ?: ILookerDashboard
+
+  private async updateDashboardElement(element: IDashboardElement, ask_changes: IShowChanges, spinner_editing: ora.Ora) {
+    const input_query = JSON.parse(ask_changes.answer)
+    let query: ILookerQuery = element.query
+    try {
+      query = {
+        ...query,
+        ...input_query,
+        can: undefined,
+        slug: undefined,
+        share_url: undefined,
+        expanded_share_url: undefined,
+        url: undefined,
+        has_table_calculations: undefined,
+        client_id: undefined
+      }
+      const new_query = await this.client.createQuery(query)
+      await this.client.updateDashboardElement(element.id, {"query_id": new_query.id})
+    }
+    catch(e) {
+      spinner_editing.fail()
+      console.error('Could not edit the Dashboard elements.')
+      let show_get_error_edit: IShowChoice = await inquirer.prompt([{
+        name: 'answer',
+        message: 'Display full error response ?',
+        type: 'list',
+        choices: [{name: 'yes'}, {name: 'no'}],
+      }])
+      if(show_get_error_edit.answer === 'yes'){
+        console.error(e)
+      }
+      return
+    }
+  }
 }
+
 
 export interface IPotentiallyDeletedContent {
   deleted?: boolean
@@ -246,7 +241,7 @@ export interface IShowChanges {
   answer: string
 }
 
-export interface IShowErrorChoice {
+export interface IShowChoice {
   answer: string
 }
 
