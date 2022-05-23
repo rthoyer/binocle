@@ -108,9 +108,7 @@ export class LookerClient {
   }
   
   public async createQuery(opts: object): Promise<ILookerQuery> {
-    console.log(opts)
     const { data } = await this.agent.post<ILookerQuery>(`${this.account.base_url}/api/4.0/queries`,opts)
-    console.log(JSON.stringify(data))
     return data
   }
 }

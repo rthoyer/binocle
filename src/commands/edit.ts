@@ -5,7 +5,7 @@ import inquirer from 'inquirer'
 import { string } from '@oclif/parser/lib/flags'
 
 export default class Edit extends Command {
-  static description = 'Copy a dashboard into a specified folder.'
+  static description = 'Edit a dashboard or a Look.'
 
   static flags = {
     base_url: flags.string({
@@ -64,6 +64,10 @@ export default class Edit extends Command {
       require: true,
     },
   ]
+  
+  private client!: LookerClient
+  private dashboard ?: ILookerDashboard
+  private look ?: ILookerLookWithQuery
 
   async run() {
     const {args, flags} = this.parse(Edit)
@@ -88,7 +92,7 @@ export default class Edit extends Command {
     catch(e) {
       spinner_edit_content.fail()
       console.error('Could not find resquested content. It may not exist.')
-      let show_get_error: IShowErrorChoice = await inquirer.prompt([{
+      let show_get_error: IShowChoice = await inquirer.prompt([{
         name: 'error',
         message: 'Display full error response ?',
         type: 'list',
@@ -102,12 +106,10 @@ export default class Edit extends Command {
     if (this.dashboard) {
       await this.editDashboard()
     }
+    else if(this.look) {
+      await this.editLook()
+    }
   }
-  
-  
-  private client!: LookerClient
-  private dashboard ?: ILookerDashboard
-  private look ?: ILookerLookWithQuery
 
   private async editDashboard() {
     if (this.dashboard) {
@@ -115,7 +117,7 @@ export default class Edit extends Command {
       if (flags.rename) {
         let ask_name_of_dashboard: IShowRename = await inquirer.prompt([{
           name: 'answer',
-          message: 'Enter the new name of the copied Dashboard :',
+          message: 'Enter the new name of this Dashboard :',
           type: 'input',
         }])
         const spinner_rename  = ora(`Editing Dashboard`).start()
@@ -146,7 +148,7 @@ export default class Edit extends Command {
             .filter(dashboard_element => dashboard_element.title_text == null)
             .map( dashboard_element => ({value: dashboard_element, name: `[Name: ${dashboard_element.title} ] [Id: ${dashboard_element.id}]`}))
       }])
-      const spinner_editing  = ora(`Editing Dashboard`).start()
+      const spinner_editing  = ora(`Editing Dashboard`)
       if (flags.bulk) {
         if (flags.get_properties) {
           let show_properties: IShowChoice = await inquirer.prompt([{
@@ -155,16 +157,18 @@ export default class Edit extends Command {
             type: 'list',
             choices: [{name: 'yes'}, {name: 'no'}],
           }])
-          console.dir(choices.dashboard_element_choices[0].query, { depth: null })
+          if (show_properties.answer == 'yes') {
+            console.dir(choices.dashboard_element_choices[0].query, { depth: null })
+          }
         }
         let ask_changes: IShowChanges = await inquirer.prompt([{
           name: 'answer',
           message: 'Enter the object containing the changes you want to apply on all Tiles selected :',
           type: 'input',
         }])
-        
+        spinner_editing.start()
         for (const element of choices.dashboard_element_choices) {
-          await this.updateDashboardElement(element, ask_changes, spinner_editing)
+          await this.updateElementQuery(element, ask_changes, spinner_editing)
         }
         spinner_editing.succeed('Your bulk has been updated !')
       }
@@ -177,21 +181,49 @@ export default class Edit extends Command {
               type: 'list',
               choices: [{name: 'yes'}, {name: 'no'}],
             }])
-            console.dir(element.query, { depth: null })
+            if (show_properties.answer == 'yes') {
+              console.dir(element.query, { depth: null })
+            }
           }
           let ask_changes: IShowChanges = await inquirer.prompt([{
             name: 'answer',
             message: 'Enter the object containing the changes you want to apply on all Tiles selected :',
             type: 'input',
           }])
-          await this.updateDashboardElement(element, ask_changes, spinner_editing)
+          await this.updateElementQuery(element, ask_changes, spinner_editing)
         } 
-        spinner_editing.succeed('Your Dashboard has been updated !')
+        spinner_editing.succeed('Your Dashboard Elements have been updated !')
       }
     }
   }
 
-  private async updateDashboardElement(element: IDashboardElement, ask_changes: IShowChanges, spinner_editing: ora.Ora) {
+  private async editLook() {
+    if (this.look) {
+      const {args, flags} = this.parse(Edit)
+      const spinner_editing  = ora(`Editing Look`)
+      if (flags.get_properties) {
+        let show_properties: IShowChoice = await inquirer.prompt([{
+          name: 'answer',
+          message: 'Would you want to see the properties of this Look ?',
+          type: 'list',
+          choices: [{name: 'yes'}, {name: 'no'}],
+        }])
+        if (show_properties.answer == 'yes') {
+          console.dir(this.look.query, { depth: null })
+        }
+      }
+      let ask_changes: IShowChanges = await inquirer.prompt([{
+        name: 'answer',
+        message: 'Enter the object containing the changes you want to apply on this Look :',
+        type: 'input',
+      }])
+      spinner_editing.start()
+      await this.updateElementQuery(this.look, ask_changes, spinner_editing)
+      spinner_editing.succeed('Your Look has been updated !')
+    }
+  }
+
+  private async updateElementQuery(element: IDashboardElement|ILookerLookWithQuery, ask_changes: IShowChanges, spinner_editing: ora.Ora) {
     const input_query = JSON.parse(ask_changes.answer)
     let query: ILookerQuery = element.query
     try {
@@ -207,7 +239,12 @@ export default class Edit extends Command {
         client_id: undefined
       }
       const new_query = await this.client.createQuery(query)
-      await this.client.updateDashboardElement(element.id, {"query_id": new_query.id})
+      if (this.dashboard) {
+        await this.client.updateDashboardElement(element.id, {"query_id": new_query.id})
+      }
+      else {
+        await this.client.updateLook(element.id, {"query_id": new_query.id})
+      }
     }
     catch(e) {
       spinner_editing.fail()
