@@ -62,6 +62,11 @@ export class LookerClient {
     return data
   }
 
+  public async copyLook(opts: ILookMovementOptions): Promise<ILookerLookWithQuery> {
+    const { data } = await this.agent.post<ILookerLookWithQuery>(`${this.account.base_url}/api/4.0/looks/${opts.look_id}/copy?${stringify(opts)}`,opts)
+    return data
+  }
+
   public async getDashboard(id: string): Promise<ILookerDashboard> {
     const { data } = await this.agent.get<ILookerDashboard>(`${this.account.base_url}/api/4.0/dashboards/${id}`)
     return data
@@ -77,6 +82,11 @@ export class LookerClient {
     return data
   }
 
+  public async copyDashboard(opts: IDashboardMovementOptions): Promise<ILookerDashboard> {
+    const { data } = await this.agent.post<ILookerDashboard>(`${this.account.base_url}/api/4.0/dashboards/${opts.dashboard_id}/copy?${stringify(opts)}`,opts)
+    return data
+  }
+
   public async getScheduledPlansForLook(id: string, opts: object): Promise<ILookerScheduledPlan[]> {
     const { data } = await this.agent.get<ILookerScheduledPlan[]>(`${this.account.base_url}/api/4.0/scheduled_plans/look/${id}?${stringify(opts)}`,opts)
     return data
@@ -89,6 +99,18 @@ export class LookerClient {
 
   public async updateScheduledPlan(id: number, opts: object): Promise<ILookerScheduledPlan[]> {
     const { data } = await this.agent.patch<ILookerScheduledPlan[]>(`${this.account.base_url}/api/4.0/scheduled_plans/${id}`,opts)
+    return data
+  }
+
+  public async updateDashboardElement(dashboard_id: string, opts: object): Promise<IDashboardElement> {
+    const { data } = await this.agent.patch<IDashboardElement>(`${this.account.base_url}/api/4.0/dashboard_elements/${dashboard_id}?${stringify(opts)}`,opts)
+    return data
+  }
+  
+  public async createQuery(opts: object): Promise<ILookerQuery> {
+    console.log(opts)
+    const { data } = await this.agent.post<ILookerQuery>(`${this.account.base_url}/api/4.0/queries`,opts)
+    console.log(JSON.stringify(data))
     return data
   }
 }
@@ -354,7 +376,7 @@ export interface ILookerLook extends ILookerLookBase{
 export interface ILookerLookBase {
   can: object
   content_metadata_id: number
-  id: number
+  id: string
   title: string
   content_favorite_id: number
   created_at: Date
@@ -390,8 +412,8 @@ export interface ILookerLookWithQuery extends ILookerLookBase{
 }
 
 export interface ILookerQuery {
- can: object
- id: number
+ can?: object
+ id?: string
  model: string
  view: string
  fields: string[]
@@ -408,14 +430,14 @@ export interface ILookerQuery {
  vis_config: object
  filter_config: object
  visible_ui_sections: string
- slug: string
+ slug?: string
  dynamic_fields: string
- client_id: string
- share_url: string
- expanded_share_url: string
- url: string
+ client_id?: string
+ share_url?: string
+ expanded_share_url?: string
+ url?: string
  query_timezone: string
- has_table_calculations: boolean
+ has_table_calculations?: boolean
 }
 
 export interface ILookerUserIdOnly {
