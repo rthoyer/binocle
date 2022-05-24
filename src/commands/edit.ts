@@ -160,13 +160,13 @@ export default class Edit extends Command {
         }])
         const spinner_edit  = ora(`Editing Dashboard`).start()
         try{
-          this.dashboard = await this.client.updateDashboard(this.dashboard.id, ask_properties)
+          this.dashboard = await this.client.updateDashboard(this.dashboard.id, JSON.parse(ask_properties.answer))
         }
         catch(e) {
           spinner_edit.fail()
           console.error('Could not edit resquested content. There might be an issue with the body object you gave.')
           let show_get_error: IShowChoice = await inquirer.prompt([{
-            name: 'error',
+            name: 'answer',
             message: 'Display full error response ?',
             type: 'list',
             choices: [{name: 'yes'}, {name: 'no'}],
