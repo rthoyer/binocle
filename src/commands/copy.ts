@@ -4,7 +4,7 @@ import LookerClient, { ILookerDashboard } from '../client/client'
 import inquirer from 'inquirer'
 
 export default class Copy extends Command {
-  static description = 'Copy a dashboard into a specified folder.'
+  static description = 'Copies a dashboard into a specified folder.'
 
   static flags = {
     base_url: flags.string({
@@ -117,24 +117,10 @@ export default class Copy extends Command {
   private client!: LookerClient
 }
 
-export interface IPotentiallyDeletedContent {
-  deleted?: boolean
-  deleted_at?: Date
-  deleter_id?: number
-}
-
-export interface IRestoreChoice {
-  restore: string
-}
-
 export interface IShowRename {
   answer: string
 }
 
 export interface IShowErrorChoice {
   answer: string
-}
-
-export interface IRestoreFolderChoice {
-  id: number
 }

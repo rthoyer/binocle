@@ -34,7 +34,7 @@ USAGE
 # Commands
 <!-- commands -->
 * [`binocle copy ID [TYPE] [FOLDER_ID]`](#binocle-copy-id-type-folder_id)
-* [`binocle edit ID [TYPE] [FOLDER_ID]`](#binocle-edit-id-type-folder_id)
+* [`binocle edit ID [TYPE]`](#binocle-edit-id-type)
 * [`binocle help [COMMAND]`](#binocle-help-command)
 * [`binocle ls [FOLDER_ID]`](#binocle-ls-folder_id)
 * [`binocle pause CONTENT_ID [TYPE] [USER_ID]`](#binocle-pause-content_id-type-user_id)
@@ -42,7 +42,7 @@ USAGE
 
 ## `binocle copy ID [TYPE] [FOLDER_ID]`
 
-Copy a dashboard into a specified folder.
+Copies a dashboard into a specified folder.
 
 ```
 USAGE
@@ -63,24 +63,33 @@ OPTIONS
 
 _See code: [src/commands/copy.ts](https://github.com/rthoyer/binocle/blob/v0.1.5/src/commands/copy.ts)_
 
-## `binocle edit ID [TYPE] [FOLDER_ID]`
+## `binocle edit ID [TYPE]`
 
-Copy a dashboard into a specified folder.
+Edits a Dashboard or a Look query elements.
 
 ```
 USAGE
-  $ binocle edit ID [TYPE] [FOLDER_ID]
+  $ binocle edit ID [TYPE]
 
 ARGUMENTS
   ID
-  TYPE       (l|d) [default: l] look (l) or dashboard (d)
-  FOLDER_ID
+  TYPE  (l|d) [default: l] look (l) or dashboard (d)
 
 OPTIONS
+  -b, --bulk                         Allows to edit dashboard tiles in bulk.
   -c, --client_id=client_id          (required) API3 credential client_id
+
+  -e, --edit_dashboard_properties    Allows to edit the properties of the dashboard before editing the dashboard
+                                     elements. (Ex : Edit filters)
+
   -h, --help                         show CLI help
+
+  -p, --get_properties               Display the properties of the content you want to edit, before editing it.
+
   -r, --rename                       Allows to rename the content that will be copied.
+
   -s, --client_secret=client_secret  (required) API3 credential client_id
+
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 ```
 

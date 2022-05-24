@@ -5,7 +5,7 @@ import inquirer from 'inquirer'
 import { string } from '@oclif/parser/lib/flags'
 
 export default class Edit extends Command {
-  static description = 'Edit a dashboard or a Look.'
+  static description = 'Edits a Dashboard or a Look query elements.'
 
   static flags = {
     base_url: flags.string({
@@ -44,9 +44,9 @@ export default class Edit extends Command {
       description: 'Display the properties of the content you want to edit, before editing it.',
       default: false,
     }),
-    edit_properties: flags.boolean({
+    edit_dashboard_properties: flags.boolean({
       char: 'e',
-      description: 'Allows to edit properties rather than replacing them. For example to edit a property enter the field and its value. To remove a field from an array of strings: enter an already existing field. A new field will be added automatically as well.',
+      description: 'Allows to edit the properties of the dashboard before editing the dashboard elements. (Ex : Edit filters)',
       default: false,
     }),
   }
@@ -68,6 +68,7 @@ export default class Edit extends Command {
   private client!: LookerClient
   private dashboard ?: ILookerDashboard
   private look ?: ILookerLookWithQuery
+  private dashboard_looks ?: ILookerLookWithQuery[] = []
 
   async run() {
     const {args, flags} = this.parse(Edit)
@@ -82,11 +83,11 @@ export default class Edit extends Command {
     try {
       if (args.type === 'd'){
         this.dashboard = await this.client.getDashboard(args.id)
-        spinner_edit_content.succeed('Dashboard : ' + this.dashboard.title + '(# ' +  this.dashboard.id + ') found !')
+        spinner_edit_content.succeed('Dashboard : ' + this.dashboard.title + '(#' +  this.dashboard.id + ') found !')
       }
       else {
         this.look = await this.client.getLook(args.id)
-        spinner_edit_content.succeed('Dashboard : ' + this.look.title + '(# ' +  this.look.id + ') found !')
+        spinner_edit_content.succeed('Dashboard : ' + this.look.title + '(#' +  this.look.id + ') found !')
       }
     }
     catch(e) {
@@ -138,22 +139,82 @@ export default class Edit extends Command {
           }
           return
         }
+        spinner_rename.succeed("Dashboard renamed !")
+      }
+      if (flags.edit_dashboard_properties) {
+        if (flags.get_properties) {
+          let show_properties: IShowChoice = await inquirer.prompt([{
+            name: 'answer',
+            message: 'Would you like to see all the properties of the dashboard ?',
+            type: 'list',
+            choices: [{name: 'yes'}, {name: 'no'}],
+          }])
+          if (show_properties.answer == 'yes') {
+            console.dir(this.dashboard, { depth: 4 })
+          }
+        }
+        let ask_properties: IShowRename = await inquirer.prompt([{
+          name: 'answer',
+          message: 'Enter the properties object for this Dashboard :',
+          type: 'input',
+        }])
+        const spinner_edit  = ora(`Editing Dashboard`).start()
+        try{
+          this.dashboard = await this.client.updateDashboard(this.dashboard.id, ask_properties)
+        }
+        catch(e) {
+          spinner_edit.fail()
+          console.error('Could not edit resquested content. There might be an issue with the body object you gave.')
+          let show_get_error: IShowChoice = await inquirer.prompt([{
+            name: 'error',
+            message: 'Display full error response ?',
+            type: 'list',
+            choices: [{name: 'yes'}, {name: 'no'}],
+          }])
+          if(show_get_error.answer === 'yes'){
+            console.error(e)
+          }
+          return
+        }
+        spinner_edit.succeed("Dashboard edited !")
       }
       let dashboard_elements = this.dashboard.dashboard_elements
+      for (const element of dashboard_elements) {
+        if (element.look_id){
+          try{
+            const look = await this.client.getLook(element.look_id)
+            this.dashboard_looks?.push(look)
+          }
+          catch(e){
+            console.error(e)
+            return
+          }
+        }
+      }
       const choices: IDashboardElementChoice = await inquirer.prompt([{
           name: 'dashboard_element_choices',
           message: `Which tiles do you want to update ?`,
           type: 'checkbox',
           choices: dashboard_elements
-            .filter(dashboard_element => dashboard_element.title_text == null)
+            .filter(dashboard_element => dashboard_element.title_text == null && dashboard_element.look_id == null)
             .map( dashboard_element => ({value: dashboard_element, name: `[Name: ${dashboard_element.title} ] [Id: ${dashboard_element.id}]`}))
       }])
+      let look_choices: IDashboardLookChoice = {dashboard_look_choices: []}
+      if (this.dashboard_looks) {   
+        look_choices = await inquirer.prompt([{
+          name: 'dashboard_look_choices',
+          message: `Your Dashboard also contains Looks linked to it. Which look would you like to edit ?`,
+          type: 'checkbox',
+          choices: this.dashboard_looks
+            .map( dashboard_look => ({value: dashboard_look, name: `[Name: ${dashboard_look.title} ] [Id: ${dashboard_look.id}]`}))
+        }])
+      }
       const spinner_editing  = ora(`Editing Dashboard`)
       if (flags.bulk) {
         if (flags.get_properties) {
           let show_properties: IShowChoice = await inquirer.prompt([{
             name: 'answer',
-            message: 'Would you want to see the properties of the first element ?',
+            message: 'Would you like to see the properties of the first element ?',
             type: 'list',
             choices: [{name: 'yes'}, {name: 'no'}],
           }])
@@ -170,6 +231,9 @@ export default class Edit extends Command {
         for (const element of choices.dashboard_element_choices) {
           await this.updateElementQuery(element, ask_changes, spinner_editing)
         }
+        for (const look of look_choices.dashboard_look_choices) {
+          await this.updateElementQuery(look, ask_changes, spinner_editing)
+        }
         spinner_editing.succeed('Your bulk has been updated !')
       }
       else {
@@ -177,7 +241,7 @@ export default class Edit extends Command {
           if (flags.get_properties) {
             let show_properties: IShowChoice = await inquirer.prompt([{
               name: 'answer',
-              message: 'Would you want to see the properties of all the elements ?',
+              message: 'Would you want to see the properties of the element : ' + element.title + '?',
               type: 'list',
               choices: [{name: 'yes'}, {name: 'no'}],
             }])
@@ -187,12 +251,31 @@ export default class Edit extends Command {
           }
           let ask_changes: IShowChanges = await inquirer.prompt([{
             name: 'answer',
-            message: 'Enter the object containing the changes you want to apply on all Tiles selected :',
+            message: 'Enter the object containing the changes you want to apply on the element' + element.title + ':',
             type: 'input',
           }])
           await this.updateElementQuery(element, ask_changes, spinner_editing)
-        } 
-        spinner_editing.succeed('Your Dashboard Elements have been updated !')
+        }
+        for (let look of look_choices.dashboard_look_choices) {
+          if (flags.get_properties) {
+            let show_properties: IShowChoice = await inquirer.prompt([{
+              name: 'answer',
+              message: 'Would you want to see the properties of all the elements ?',
+              type: 'list',
+              choices: [{name: 'yes'}, {name: 'no'}],
+            }])
+            if (show_properties.answer == 'yes') {
+              console.dir(look.query, { depth: null })
+            }
+          }
+          let ask_changes: IShowChanges = await inquirer.prompt([{
+            name: 'answer',
+            message: 'Enter the object containing the changes you want to apply this element :',
+            type: 'input',
+          }])
+          await this.updateElementQuery(look, ask_changes, spinner_editing)
+        }
+        spinner_editing.succeed('Your Dashboard Looks have been updated !')
       }
     }
   }
@@ -263,17 +346,6 @@ export default class Edit extends Command {
   }
 }
 
-
-export interface IPotentiallyDeletedContent {
-  deleted?: boolean
-  deleted_at?: Date
-  deleter_id?: number
-}
-
-export interface IRestoreChoice {
-  restore: string
-}
-
 export interface IShowChanges {
   answer: string
 }
@@ -282,13 +354,13 @@ export interface IShowChoice {
   answer: string
 }
 
-export interface IRestoreFolderChoice {
-  id: number
+export interface IDashboardElementChoice {
+  dashboard_element_choices: IDashboardElement[]
 }
 
-export interface IDashboardElementChoice {
-    dashboard_element_choices: IDashboardElement[]
-  }
+export interface IDashboardLookChoice {
+  dashboard_look_choices: ILookerLookWithQuery[]
+}
 
 export interface IShowRename {
   answer: string
