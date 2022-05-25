@@ -65,7 +65,7 @@ _See code: [src/commands/copy.ts](https://github.com/rthoyer/binocle/blob/v0.1.5
 
 ## `binocle edit ID [TYPE]`
 
-Edits a Dashboard or a Look query elements.
+Edit queries of Looks and Dashboard tiles.
 
 ```
 USAGE

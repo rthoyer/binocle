@@ -2,10 +2,9 @@ import {Command, flags} from '@oclif/command'
 import ora from 'ora'
 import LookerClient, { IDashboardElement, ILookerDashboard, ILookerLook, ILookerLookWithQuery, ILookerQuery } from '../client/client'
 import inquirer from 'inquirer'
-import { string } from '@oclif/parser/lib/flags'
 
 export default class Edit extends Command {
-  static description = 'Edits a Dashboard or a Look query elements.'
+  static description = 'Edit queries of Looks and Dashboard tiles.'
 
   static flags = {
     base_url: flags.string({
