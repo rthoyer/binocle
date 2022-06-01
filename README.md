@@ -24,7 +24,7 @@ $ npm install -g binocle
 $ binocle COMMAND
 running command...
 $ binocle (-v|--version|version)
-binocle/0.1.5 darwin-x64 node-v16.14.2
+binocle/0.1.6 darwin-x64 node-v16.14.2
 $ binocle --help [COMMAND]
 USAGE
   $ binocle COMMAND
@@ -61,7 +61,7 @@ OPTIONS
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 ```
 
-_See code: [src/commands/copy.ts](https://github.com/rthoyer/binocle/blob/v0.1.5/src/commands/copy.ts)_
+_See code: [src/commands/copy.ts](https://github.com/rthoyer/binocle/blob/v0.1.6/src/commands/copy.ts)_
 
 ## `binocle edit ID [TYPE]`
 
@@ -93,7 +93,7 @@ OPTIONS
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 ```
 
-_See code: [src/commands/edit.ts](https://github.com/rthoyer/binocle/blob/v0.1.5/src/commands/edit.ts)_
+_See code: [src/commands/edit.ts](https://github.com/rthoyer/binocle/blob/v0.1.6/src/commands/edit.ts)_
 
 ## `binocle help [COMMAND]`
 
@@ -110,7 +110,7 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.4/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.3.1/src/commands/help.ts)_
 
 ## `binocle ls [FOLDER_ID]`
 
@@ -142,7 +142,7 @@ EXAMPLE
   |   📁 Folder C #156 (D:1 - L:7)
 ```
 
-_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.1.5/src/commands/ls.ts)_
+_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.1.6/src/commands/ls.ts)_
 
 ## `binocle pause CONTENT_ID [TYPE] [USER_ID]`
 
@@ -168,7 +168,7 @@ ALIASES
   $ binocle schedule:pause
 ```
 
-_See code: [src/commands/pause.ts](https://github.com/rthoyer/binocle/blob/v0.1.5/src/commands/pause.ts)_
+_See code: [src/commands/pause.ts](https://github.com/rthoyer/binocle/blob/v0.1.6/src/commands/pause.ts)_
 
 ## `binocle restore ID [TYPE]`
 
@@ -189,5 +189,5 @@ OPTIONS
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 ```
 
-_See code: [src/commands/restore.ts](https://github.com/rthoyer/binocle/blob/v0.1.5/src/commands/restore.ts)_
+_See code: [src/commands/restore.ts](https://github.com/rthoyer/binocle/blob/v0.1.6/src/commands/restore.ts)_
 <!-- commandsstop -->
