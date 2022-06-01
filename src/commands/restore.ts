@@ -54,13 +54,13 @@ export default class Restore extends Command {
     await this.client.auth()
     const content : IPotentiallyDeletedContent = {}
     const spinner_get_content  = ora(`Fetching Content information`).start()
-      try {
+    try {
       if (args.type === 'l'){
-      const look = await this.client.getLook(args.id)
-      content.deleted = look.deleted
-      content.deleted_at = look.deleted_at
-      content.deleted_at = look.deleted_at
-      spinner_get_content.succeed()
+        const look = await this.client.getLook(args.id)
+        content.deleted = look.deleted
+        content.deleted_at = look.deleted_at
+        content.deleted_at = look.deleted_at
+        spinner_get_content.succeed()
       }
       else {
         const dashboard = await this.client.getDashboard(args.id)

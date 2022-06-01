@@ -66,8 +66,8 @@ export default class Pause extends Command {
     const spinner_get_schedules  = ora(`Fetching Content schedules`).start()
     try {
       if (args.type === 'l'){
-      schedules = await this.client.getScheduledPlansForLook(args.content_id, ( args?.user_id ?{ user_id: args.user_id} : {}))
-      spinner_get_schedules.succeed()
+        schedules = await this.client.getScheduledPlansForLook(args.content_id, ( args?.user_id ?{ user_id: args.user_id} : {}))
+        spinner_get_schedules.succeed()
       }
       else {
         schedules = await this.client.getScheduledPlansForDashboard(args.content_id, ( args?.user_id ?{ user_id: args.user_id} : {}))
