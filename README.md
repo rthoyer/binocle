@@ -24,7 +24,7 @@ $ npm install -g binocle
 $ binocle COMMAND
 running command...
 $ binocle (-v|--version|version)
-binocle/0.1.6 darwin-x64 node-v16.14.2
+binocle/0.1.6 darwin-arm64 node-v19.6.0
 $ binocle --help [COMMAND]
 USAGE
   $ binocle COMMAND
@@ -39,6 +39,7 @@ USAGE
 * [`binocle ls [FOLDER_ID]`](#binocle-ls-folder_id)
 * [`binocle pause CONTENT_ID [TYPE] [USER_ID]`](#binocle-pause-content_id-type-user_id)
 * [`binocle restore ID [TYPE]`](#binocle-restore-id-type)
+* [`binocle share FOLDER_ID ID [TYPE]`](#binocle-share-folder_id-id-type)
 
 ## `binocle copy ID [TYPE] [FOLDER_ID]`
 
@@ -110,7 +111,7 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.3.1/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.18/src/commands/help.ts)_
 
 ## `binocle ls [FOLDER_ID]`
 
@@ -190,4 +191,27 @@ OPTIONS
 ```
 
 _See code: [src/commands/restore.ts](https://github.com/rthoyer/binocle/blob/v0.1.6/src/commands/restore.ts)_
+
+## `binocle share FOLDER_ID ID [TYPE]`
+
+Shares a folder and its parents up until the shared folders to a group or a user
+
+```
+USAGE
+  $ binocle share FOLDER_ID ID [TYPE]
+
+ARGUMENTS
+  FOLDER_ID
+  ID
+  TYPE       (g|u) [default: g] group (g) or user (u)
+
+OPTIONS
+  -c, --client_id=client_id          (required) API3 credential client_id
+  -e, --edit_right                   Shares with edit rights
+  -h, --help                         show CLI help
+  -s, --client_secret=client_secret  (required) API3 credential client_id
+  -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
+```
+
+_See code: [src/commands/share.ts](https://github.com/rthoyer/binocle/blob/v0.1.6/src/commands/share.ts)_
 <!-- commandsstop -->

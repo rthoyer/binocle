@@ -1,4 +1,4 @@
-import axios, {AxiosResponse, AxiosInstance} from 'axios'
+import axios, { AxiosInstance } from 'axios'
 import https from 'https'
 import { stringify } from 'qs'
 import ora from 'ora'
@@ -42,6 +42,11 @@ export class LookerClient {
 
   public async getFolder(folder_id: string): Promise<ILookerFolder> {
     const { data } = await this.agent.get<ILookerFolder>(`${this.prefix}/folders/${folder_id}`)
+    return data
+  }
+
+  public async updateContentMetadataAccesses(content_metadata_id: number, body: Partial<ILookerContentMetaGroupUser>): Promise<ILookerContentMetaGroupUser> {
+    const { data } = await this.agent.post<ILookerContentMetaGroupUser>(`${this.prefix}/content_metadata_access`, body)
     return data
   }
 
@@ -157,6 +162,15 @@ export interface ILookerFolder {
   dashboards: ILookerDashboardBase[]
   looks: ILookerLook[]
   can: object
+}
+
+export interface ILookerContentMetaGroupUser {
+  can: object
+  id: string
+  content_metadata_id: number
+  permission_type: string
+  group_id: string
+  user_id: string
 }
 
 export interface ILookerDashboardBase {
