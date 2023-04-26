@@ -6,6 +6,7 @@ import ora from 'ora'
 export class LookerClient {
   constructor(account: ILookerAccount, agent?: https.Agent) {
     this.account = account
+    this.prefix = `${this.account.base_url}/api/4.0`
     this.agent = axios.create({httpsAgent: agent, withCredentials: true})
     this.agent.interceptors.request.use(request => {
       if (request.headers && this.access_token) {
@@ -19,12 +20,14 @@ export class LookerClient {
 
   public agent: AxiosInstance
 
+  public prefix: string
+
   public readonly account: ILookerAccount
 
   public async auth(): Promise<ILookerAuth | any> {
     const spinner_auth = ora('Looker Authentication').start()
     try {
-      const { data } = await this.agent.post<ILookerAuth>(`${this.account.base_url}/api/4.0/login?${stringify({
+      const { data } = await this.agent.post<ILookerAuth>(`${this.prefix}/login?${stringify({
         client_id: this.account.client_id,
         client_secret: this.account.client_secret,
       })}`)
@@ -38,77 +41,77 @@ export class LookerClient {
   }
 
   public async getFolder(folder_id: string): Promise<ILookerFolder> {
-    const { data } = await this.agent.get<ILookerFolder>(`${this.account.base_url}/api/4.0/folders/${folder_id}`)
+    const { data } = await this.agent.get<ILookerFolder>(`${this.prefix}/folders/${folder_id}`)
     return data
   }
 
   public async getFolderChildren(folder_id: string, opts?: ILookerFolderChildrenOptions): Promise<ILookerFolder[]> {
-    const { data } = await this.agent.get<ILookerFolder[]>(`${this.account.base_url}/api/4.0/folders/${folder_id}/children?${stringify(opts)}`)
+    const { data } = await this.agent.get<ILookerFolder[]>(`${this.prefix}/folders/${folder_id}/children?${stringify(opts)}`)
     return data
   }
 
   public async getLook(id: string): Promise<ILookerLookWithQuery> {
-    const { data } = await this.agent.get<ILookerLookWithQuery>(`${this.account.base_url}/api/4.0/looks/${id}`)
+    const { data } = await this.agent.get<ILookerLookWithQuery>(`${this.prefix}/looks/${id}`)
     return data
   }
 
   public async updateLook(id: string, opts: object): Promise<ILookerLookWithQuery> {
-    const { data } = await this.agent.patch<ILookerLookWithQuery>(`${this.account.base_url}/api/4.0/looks/${id}?${stringify(opts)}`,opts)
+    const { data } = await this.agent.patch<ILookerLookWithQuery>(`${this.prefix}/looks/${id}?${stringify(opts)}`,opts)
     return data
   }
 
   public async moveLook(opts: ILookMovementOptions): Promise<ILookerLookWithQuery> {
-    const { data } = await this.agent.patch<ILookerLookWithQuery>(`${this.account.base_url}/api/4.0/looks/${opts.look_id}/move?${stringify(opts)}`,opts)
+    const { data } = await this.agent.patch<ILookerLookWithQuery>(`${this.prefix}/looks/${opts.look_id}/move?${stringify(opts)}`,opts)
     return data
   }
 
   public async copyLook(opts: ILookMovementOptions): Promise<ILookerLookWithQuery> {
-    const { data } = await this.agent.post<ILookerLookWithQuery>(`${this.account.base_url}/api/4.0/looks/${opts.look_id}/copy?${stringify(opts)}`,opts)
+    const { data } = await this.agent.post<ILookerLookWithQuery>(`${this.prefix}/looks/${opts.look_id}/copy?${stringify(opts)}`,opts)
     return data
   }
 
   public async getDashboard(id: string): Promise<ILookerDashboard> {
-    const { data } = await this.agent.get<ILookerDashboard>(`${this.account.base_url}/api/4.0/dashboards/${id}`)
+    const { data } = await this.agent.get<ILookerDashboard>(`${this.prefix}/dashboards/${id}`)
     return data
   }
 
   public async updateDashboard(id: string, opts: object): Promise<ILookerDashboard> {
-    const { data } = await this.agent.patch<ILookerDashboard>(`${this.account.base_url}/api/4.0/dashboards/${id}?${stringify(opts)}`,opts)
+    const { data } = await this.agent.patch<ILookerDashboard>(`${this.prefix}/dashboards/${id}?${stringify(opts)}`,opts)
     return data
   }
 
   public async moveDashboard(opts: IDashboardMovementOptions): Promise<ILookerDashboard> {
-    const { data } = await this.agent.patch<ILookerDashboard>(`${this.account.base_url}/api/4.0/dashboards/${opts.dashboard_id}/move?${stringify(opts)}`,opts)
+    const { data } = await this.agent.patch<ILookerDashboard>(`${this.prefix}/dashboards/${opts.dashboard_id}/move?${stringify(opts)}`,opts)
     return data
   }
 
   public async copyDashboard(opts: IDashboardMovementOptions): Promise<ILookerDashboard> {
-    const { data } = await this.agent.post<ILookerDashboard>(`${this.account.base_url}/api/4.0/dashboards/${opts.dashboard_id}/copy?${stringify(opts)}`,opts)
+    const { data } = await this.agent.post<ILookerDashboard>(`${this.prefix}/dashboards/${opts.dashboard_id}/copy?${stringify(opts)}`,opts)
     return data
   }
 
   public async getScheduledPlansForLook(id: string, opts: object): Promise<ILookerScheduledPlan[]> {
-    const { data } = await this.agent.get<ILookerScheduledPlan[]>(`${this.account.base_url}/api/4.0/scheduled_plans/look/${id}?${stringify(opts)}`,opts)
+    const { data } = await this.agent.get<ILookerScheduledPlan[]>(`${this.prefix}/scheduled_plans/look/${id}?${stringify(opts)}`,opts)
     return data
   }
 
   public async getScheduledPlansForDashboard(id: string, opts: object): Promise<ILookerScheduledPlan[]> {
-    const { data } = await this.agent.get<ILookerScheduledPlan[]>(`${this.account.base_url}/api/4.0/scheduled_plans/dashboard/${id}?${stringify(opts)}`,opts)
+    const { data } = await this.agent.get<ILookerScheduledPlan[]>(`${this.prefix}/scheduled_plans/dashboard/${id}?${stringify(opts)}`,opts)
     return data
   }
 
   public async updateScheduledPlan(id: number, opts: object): Promise<ILookerScheduledPlan[]> {
-    const { data } = await this.agent.patch<ILookerScheduledPlan[]>(`${this.account.base_url}/api/4.0/scheduled_plans/${id}`,opts)
+    const { data } = await this.agent.patch<ILookerScheduledPlan[]>(`${this.prefix}/scheduled_plans/${id}`,opts)
     return data
   }
 
   public async updateDashboardElement(dashboard_id: string, opts: object): Promise<IDashboardElement> {
-    const { data } = await this.agent.patch<IDashboardElement>(`${this.account.base_url}/api/4.0/dashboard_elements/${dashboard_id}?${stringify(opts)}`,opts)
+    const { data } = await this.agent.patch<IDashboardElement>(`${this.prefix}/dashboard_elements/${dashboard_id}?${stringify(opts)}`,opts)
     return data
   }
   
   public async createQuery(opts: object): Promise<ILookerQuery> {
-    const { data } = await this.agent.post<ILookerQuery>(`${this.account.base_url}/api/4.0/queries`,opts)
+    const { data } = await this.agent.post<ILookerQuery>(`${this.prefix}/queries`,opts)
     return data
   }
 }
