@@ -202,7 +202,7 @@ USAGE
 
 OPTIONS
   -c, --client_id=client_id          (required) API3 credential client_id
-  -e, --edit_right                   Shares with edit rights
+  -e, --edit_right                   Shares the folder with edit rights (and parents with view rights)
   -f, --folder_id=folder_id          (required) API3 credential client_id
   -g, --is_group                     The provided id is the one of a group, not a user
   -h, --help                         show CLI help
