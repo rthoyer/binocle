@@ -4,7 +4,7 @@ import LookerClient, { ILookerFolder } from '../client/client'
 import inquirer from 'inquirer'
 
 export default class Share extends Command {
-  static description = 'Shares a folder and its parents up until the shared/users root folder to a group or a user'
+  static description = 'Shares a folder and its parents up until the shared/users root folder to a group or a user. It deactivates the inheritance of access levels from parents for all these folders.'
 
   static flags = {
     base_url: flags.string({
@@ -85,6 +85,8 @@ export default class Share extends Command {
     try {
       this.debug(parents)
       for (const folder of parents) {
+        await this.client.updateContentMetadata(folder.content_metadata_id.toString(), { inherits: false })
+        this.debug(`Forced non heritance`)
         const accesses = await this.client.getAllContentMetadataAccesses(folder.content_metadata_id)
         const existing_access = accesses.find((access) => access[flags.is_group ? 'group_id' : 'user_id'] === flags.id)
         this.debug(existing_access)

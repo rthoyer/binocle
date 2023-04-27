@@ -194,7 +194,7 @@ _See code: [src/commands/restore.ts](https://github.com/rthoyer/binocle/blob/v0.
 
 ## `binocle share`
 
-Shares a folder and its parents up until the shared/users root folder to a group or a user
+Shares a folder and its parents up until the shared/users root folder to a group or a user. It deactivates the inheritance of access levels from parents for all these folders.
 
 ```
 USAGE

@@ -50,6 +50,11 @@ export class LookerClient {
     return data
   }
 
+  public async updateContentMetadata(content_metadata_id: string, body: ILookerWriteContentMeta): Promise<ILookerContentMeta> {
+    const { data } = await this.agent.patch<ILookerContentMeta>(`${this.prefix}/content_metadata/${content_metadata_id}`, body)
+    return data
+  }
+
   public async updateContentMetadataAccesses(content_metadata_access_id: string, body: Partial<ILookerContentMetaGroupUser>): Promise<ILookerContentMetaGroupUser> {
     const { data } = await this.agent.put<ILookerContentMetaGroupUser>(`${this.prefix}/content_metadata_access/${content_metadata_access_id}`, body)
     return data
@@ -172,6 +177,24 @@ export interface ILookerFolder {
   dashboards: ILookerDashboardBase[]
   looks: ILookerLook[]
   can: object
+}
+
+export interface ILookerContentMeta {
+  can?: object
+  id?: string
+  name?: string | null
+  parent_id?: string | null
+  dashboard_id?: string | null
+  look_id?: string | null
+  folder_id?: string | null
+  content_type?: string | null
+  inherits?: boolean
+  inheriting_id?: string | null
+  slug?: string | null
+}
+
+export interface ILookerWriteContentMeta {
+  inherits?: boolean
 }
 
 export interface ILookerContentMetaGroupUser {
