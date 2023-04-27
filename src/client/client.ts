@@ -45,8 +45,18 @@ export class LookerClient {
     return data
   }
 
-  public async updateContentMetadataAccesses(content_metadata_id: number, body: Partial<ILookerContentMetaGroupUser>): Promise<ILookerContentMetaGroupUser> {
+  public async createContentMetadataAccesses(body: Partial<ILookerContentMetaGroupUser>): Promise<ILookerContentMetaGroupUser> {
     const { data } = await this.agent.post<ILookerContentMetaGroupUser>(`${this.prefix}/content_metadata_access`, body)
+    return data
+  }
+
+  public async updateContentMetadataAccesses(content_metadata_access_id: string, body: Partial<ILookerContentMetaGroupUser>): Promise<ILookerContentMetaGroupUser> {
+    const { data } = await this.agent.put<ILookerContentMetaGroupUser>(`${this.prefix}/content_metadata_access/${content_metadata_access_id}`, body)
+    return data
+  }
+
+  public async getAllContentMetadataAccesses(content_metadata_id: number, fields?: string[]): Promise<ILookerContentMetaGroupUser[]> {
+    const { data } = await this.agent.get<ILookerContentMetaGroupUser[]>(`${this.prefix}/content_metadata_access${stringify({content_metadata_id, fields})}`)
     return data
   }
 

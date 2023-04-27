@@ -4,7 +4,7 @@ import LookerClient, { ILookerFolder } from '../client/client'
 import inquirer from 'inquirer'
 
 export default class Share extends Command {
-  static description = 'Shares a folder and its parents up until the shared folders to a group or a user'
+  static description = 'Shares a folder and its parents up until the shared/users root folder to a group or a user'
 
   static flags = {
     base_url: flags.string({
@@ -30,6 +30,11 @@ export default class Share extends Command {
       default: false,
       description: 'Shares with edit rights',
     }),
+    is_group: flags.boolean({
+      char: 'g',
+      default: false,
+      description: 'The provided id is the one of a group, not a user',
+    }),
     help: flags.help({
       char: 'h',
     }),
@@ -44,26 +49,7 @@ export default class Share extends Command {
       name: 'id',
       required: true,
     },
-    {
-      name: 'type',
-      default: 'g',
-      description: 'group (g) or user (u)',
-      options: ['g', 'u']
-    },
   ]
-
-  async getParents(parents: IParentFolder[]): Promise<IParentFolder[]>{
-    const last_parent: ILookerFolder = await this.client.getFolder(parents[0].id)
-    if(last_parent.is_shared_root || last_parent.is_users_root || !last_parent.parent_id){
-      return parents
-    }
-    else {
-      const new_parent : ILookerFolder = await this.client.getFolder(last_parent.parent_id)
-      parents.unshift({id : new_parent.id, content_metadata_id: new_parent.content_metadata_id})
-      return await this.getParents(parents)
-    }
-  }
-  
 
   async run() {
     const {args, flags} = this.parse(Share)
@@ -99,10 +85,23 @@ export default class Share extends Command {
     const spinner_share_parents  = ora(`Sharing folders`).start()
     try {
       for (const folder of parents) {
-        // handle case when already shared with that user/group
-        await this.client.updateContentMetadataAccesses(folder.content_metadata_id, {
-          ...(args.type === 'g' ? {group_id : args.id} : {}),
-          ...(args.type === 'g' ? {} : {user_id : args.id}),
+        const accesses = await this.client.getAllContentMetadataAccesses(folder.content_metadata_id)
+        const existing_access = accesses.find((access) => access[args.is_group ? 'group_id' : 'user_id'] = args.id)
+        if (!!existing_access){
+          if(existing_access.permission_type === args.edit_right ? 'edit' : 'view' ){
+            continue
+          }
+          await this.client.updateContentMetadataAccesses(existing_access.id, {
+            ...(args.is_group ? {group_id : args.id} : {}),
+            ...(args.is_group ? {} : {user_id : args.id}),
+            permission_type : args.edit_right ? 'edit' : 'view',
+            content_metadata_id: folder.content_metadata_id,
+          })
+          continue
+        }
+        await this.client.createContentMetadataAccesses({
+          ...(args.is_group ? {group_id : args.id} : {}),
+          ...(args.is_group ? {} : {user_id : args.id}),
           permission_type : args.edit_right ? 'edit' : 'view',
           content_metadata_id: folder.content_metadata_id,
         })
@@ -112,6 +111,19 @@ export default class Share extends Command {
     catch(e) {
       spinner_share_parents.fail()
       console.error(e)
+    }
+  }
+
+
+  public async getParents(parents: IParentFolder[]): Promise<IParentFolder[]>{
+    const last_parent: ILookerFolder = await this.client.getFolder(parents[0].id)
+    if(last_parent.is_shared_root || last_parent.is_users_root || !last_parent.parent_id){
+      return parents
+    }
+    else {
+      const new_parent : ILookerFolder = await this.client.getFolder(last_parent.parent_id)
+      parents.unshift({id : new_parent.id, content_metadata_id: new_parent.content_metadata_id})
+      return await this.getParents(parents)
     }
   }
   
