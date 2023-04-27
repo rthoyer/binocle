@@ -38,7 +38,7 @@ export default class Share extends Command {
     edit_right: flags.boolean({
       char: 'e',
       default: false,
-      description: 'Shares with edit rights',
+      description: 'Shares the folder with edit rights (and parents with view rights)',
     }),
     is_group: flags.boolean({
       char: 'g',
@@ -86,7 +86,7 @@ export default class Share extends Command {
       this.debug(parents)
       for (const folder of parents) {
         const accesses = await this.client.getAllContentMetadataAccesses(folder.content_metadata_id)
-        const existing_access = accesses.find((access) => access[flags.is_group ? 'group_id' : 'user_id'] = flags.id)
+        const existing_access = accesses.find((access) => access[flags.is_group ? 'group_id' : 'user_id'] === flags.id)
         this.debug(existing_access)
         if (!!existing_access){
           if (existing_access.permission_type === (flags.edit_right ? 'edit' : 'view') ){
@@ -96,7 +96,7 @@ export default class Share extends Command {
           await this.client.updateContentMetadataAccesses(existing_access.id, {
             ...(flags.is_group ? {group_id : flags.id} : {}),
             ...(flags.is_group ? {} : {user_id : flags.id}),
-            permission_type : flags.edit_right ? 'edit' : 'view',
+            permission_type : flags.edit_right && folder.id === flags.id ? 'edit' : 'view',
             content_metadata_id: folder.content_metadata_id,
           })
           this.debug(`Updated access to folder ${folder.id} of ${flags.is_group ? 'group' : 'user'} ${flags.id}`)
@@ -105,7 +105,7 @@ export default class Share extends Command {
         await this.client.createContentMetadataAccesses({
           ...(flags.is_group ? {group_id : flags.id} : {}),
           ...(flags.is_group ? {} : {user_id : flags.id}),
-          permission_type : flags.edit_right ? 'edit' : 'view',
+          permission_type : flags.edit_right && folder.id === flags.id ? 'edit' : 'view',
           content_metadata_id: folder.content_metadata_id,
         })
         this.debug(`Created ${flags.edit_right ? 'edit' : 'view'} access to folder ${folder.id} of ${flags.is_group ? 'group' : 'user'} ${flags.id}`)
