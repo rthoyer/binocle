@@ -56,7 +56,7 @@ export class LookerClient {
   }
 
   public async getAllContentMetadataAccesses(content_metadata_id: number, fields?: string[]): Promise<ILookerContentMetaGroupUser[]> {
-    const { data } = await this.agent.get<ILookerContentMetaGroupUser[]>(`${this.prefix}/content_metadata_access${stringify({content_metadata_id, fields})}`)
+    const { data } = await this.agent.get<ILookerContentMetaGroupUser[]>(`${this.prefix}/content_metadata_access?${stringify({content_metadata_id, fields})}`)
     return data
   }
 
