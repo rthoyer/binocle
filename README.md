@@ -24,7 +24,7 @@ $ npm install -g binocle
 $ binocle COMMAND
 running command...
 $ binocle (-v|--version|version)
-binocle/0.1.7 darwin-arm64 node-v19.6.0
+binocle/0.2.0 darwin-arm64 node-v19.6.0
 $ binocle --help [COMMAND]
 USAGE
   $ binocle COMMAND
@@ -62,7 +62,7 @@ OPTIONS
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 ```
 
-_See code: [src/commands/copy.ts](https://github.com/rthoyer/binocle/blob/v0.1.7/src/commands/copy.ts)_
+_See code: [src/commands/copy.ts](https://github.com/rthoyer/binocle/blob/v0.2.0/src/commands/copy.ts)_
 
 ## `binocle edit ID [TYPE]`
 
@@ -94,7 +94,7 @@ OPTIONS
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 ```
 
-_See code: [src/commands/edit.ts](https://github.com/rthoyer/binocle/blob/v0.1.7/src/commands/edit.ts)_
+_See code: [src/commands/edit.ts](https://github.com/rthoyer/binocle/blob/v0.2.0/src/commands/edit.ts)_
 
 ## `binocle help [COMMAND]`
 
@@ -143,7 +143,7 @@ EXAMPLE
   |   📁 Folder C #156 (D:1 - L:7)
 ```
 
-_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.1.7/src/commands/ls.ts)_
+_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.2.0/src/commands/ls.ts)_
 
 ## `binocle pause CONTENT_ID [TYPE] [USER_ID]`
 
@@ -169,7 +169,7 @@ ALIASES
   $ binocle schedule:pause
 ```
 
-_See code: [src/commands/pause.ts](https://github.com/rthoyer/binocle/blob/v0.1.7/src/commands/pause.ts)_
+_See code: [src/commands/pause.ts](https://github.com/rthoyer/binocle/blob/v0.2.0/src/commands/pause.ts)_
 
 ## `binocle restore ID [TYPE]`
 
@@ -190,7 +190,7 @@ OPTIONS
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 ```
 
-_See code: [src/commands/restore.ts](https://github.com/rthoyer/binocle/blob/v0.1.7/src/commands/restore.ts)_
+_See code: [src/commands/restore.ts](https://github.com/rthoyer/binocle/blob/v0.2.0/src/commands/restore.ts)_
 
 ## `binocle share`
 
@@ -211,5 +211,5 @@ OPTIONS
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 ```
 
-_See code: [src/commands/share.ts](https://github.com/rthoyer/binocle/blob/v0.1.7/src/commands/share.ts)_
+_See code: [src/commands/share.ts](https://github.com/rthoyer/binocle/blob/v0.2.0/src/commands/share.ts)_
 <!-- commandsstop -->
