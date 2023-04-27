@@ -90,7 +90,7 @@ export default class Share extends Command {
         this.debug(existing_access)
         if (!!existing_access){
           if (existing_access.permission_type === (flags.edit_right ? 'edit' : 'view') ){
-            console.log('skip')
+            this.debug(`Skipped folder ${folder.id}`)
             continue
           }
           await this.client.updateContentMetadataAccesses(existing_access.id, {
