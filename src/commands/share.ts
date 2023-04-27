@@ -25,7 +25,17 @@ export default class Share extends Command {
       env: 'LOOKERSDK_CLIENT_SECRET',
       required: true,
     }),
-    edit_right: flags.boolean({ // Check this works
+    folder_id: flags.string({
+      char: 'f',
+      description: 'API3 credential client_id',
+      required: true,
+    }),
+    id: flags.string({
+      char: 'i',
+      description: 'Group or user id',
+      required: true,
+    }),
+    edit_right: flags.boolean({
       char: 'e',
       default: false,
       description: 'Shares with edit rights',
@@ -40,20 +50,9 @@ export default class Share extends Command {
     }),
   }
 
-  static args = [
-    {
-      name: 'folder_id',
-      required: true,
-    },
-    {
-      name: 'id',
-      required: true,
-    },
-  ]
-
   async run() {
-    const {args, flags} = this.parse(Share)
-    this.debug('[args: %o]', args)
+    const {flags} = this.parse(Share)
+    this.debug('[flags: %o]', flags)
     this.client = new LookerClient({
       client_id: flags.client_id,
       client_secret: flags.client_secret,
@@ -63,8 +62,8 @@ export default class Share extends Command {
     let parents : IParentFolder[]
     const spinner_get_parents  = ora(`Fetching parent folders`).start()
     try {
-      const folder = await this.client.getFolder(args.folder_id)
-      parents = [ {id : args.folder_id, content_metadata_id: folder.content_metadata_id} ]
+      const folder = await this.client.getFolder(flags.folder_id)
+      parents = [ {id : flags.folder_id, content_metadata_id: folder.content_metadata_id} ]
       parents = await this.getParents(parents)
       spinner_get_parents.succeed('Parent folders found')
     }
@@ -84,27 +83,32 @@ export default class Share extends Command {
     }
     const spinner_share_parents  = ora(`Sharing folders`).start()
     try {
+      this.debug(parents)
       for (const folder of parents) {
         const accesses = await this.client.getAllContentMetadataAccesses(folder.content_metadata_id)
-        const existing_access = accesses.find((access) => access[args.is_group ? 'group_id' : 'user_id'] = args.id)
+        const existing_access = accesses.find((access) => access[flags.is_group ? 'group_id' : 'user_id'] = flags.id)
+        this.debug(existing_access)
         if (!!existing_access){
-          if(existing_access.permission_type === args.edit_right ? 'edit' : 'view' ){
+          if (existing_access.permission_type === (flags.edit_right ? 'edit' : 'view') ){
+            console.log('skip')
             continue
           }
           await this.client.updateContentMetadataAccesses(existing_access.id, {
-            ...(args.is_group ? {group_id : args.id} : {}),
-            ...(args.is_group ? {} : {user_id : args.id}),
-            permission_type : args.edit_right ? 'edit' : 'view',
+            ...(flags.is_group ? {group_id : flags.id} : {}),
+            ...(flags.is_group ? {} : {user_id : flags.id}),
+            permission_type : flags.edit_right ? 'edit' : 'view',
             content_metadata_id: folder.content_metadata_id,
           })
+          this.debug(`Updated access to folder ${folder.id} of ${flags.is_group ? 'group' : 'user'} ${flags.id}`)
           continue
         }
         await this.client.createContentMetadataAccesses({
-          ...(args.is_group ? {group_id : args.id} : {}),
-          ...(args.is_group ? {} : {user_id : args.id}),
-          permission_type : args.edit_right ? 'edit' : 'view',
+          ...(flags.is_group ? {group_id : flags.id} : {}),
+          ...(flags.is_group ? {} : {user_id : flags.id}),
+          permission_type : flags.edit_right ? 'edit' : 'view',
           content_metadata_id: folder.content_metadata_id,
         })
+        this.debug(`Created ${flags.edit_right ? 'edit' : 'view'} access to folder ${folder.id} of ${flags.is_group ? 'group' : 'user'} ${flags.id}`)
       }
       spinner_share_parents.succeed('Folders Shared')
     }
