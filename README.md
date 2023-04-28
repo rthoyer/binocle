@@ -9,7 +9,7 @@ Brilliant Instance Navigation, Organisation and Cleaning Looker Executable
 [![License](https://img.shields.io/npm/l/binocle.svg)](https://github.com/rthoyer/binocle/blob/master/package.json)
 
 This CLI tool was initially developed during the Hack@Home 2021 Hackathon organized by Looker.  
-It uses the environement variables described in the [Looker Codegen SDK](https://github.com/looker-open-source/sdk-codegen#environment-variable-configuration).
+It uses the environment variables described in the [Looker Codegen SDK](https://github.com/looker-open-source/sdk-codegen#environment-variable-configuration).
 
 It aims at providing a set of tools to better understand, organise and document your Looker instance.
 
@@ -24,7 +24,7 @@ $ npm install -g binocle
 $ binocle COMMAND
 running command...
 $ binocle (-v|--version|version)
-binocle/0.1.6 darwin-x64 node-v16.14.2
+binocle/0.2.1 darwin-arm64 node-v19.6.0
 $ binocle --help [COMMAND]
 USAGE
   $ binocle COMMAND
@@ -39,6 +39,7 @@ USAGE
 * [`binocle ls [FOLDER_ID]`](#binocle-ls-folder_id)
 * [`binocle pause CONTENT_ID [TYPE] [USER_ID]`](#binocle-pause-content_id-type-user_id)
 * [`binocle restore ID [TYPE]`](#binocle-restore-id-type)
+* [`binocle share`](#binocle-share)
 
 ## `binocle copy ID [TYPE] [FOLDER_ID]`
 
@@ -61,7 +62,7 @@ OPTIONS
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 ```
 
-_See code: [src/commands/copy.ts](https://github.com/rthoyer/binocle/blob/v0.1.6/src/commands/copy.ts)_
+_See code: [src/commands/copy.ts](https://github.com/rthoyer/binocle/blob/v0.2.1/src/commands/copy.ts)_
 
 ## `binocle edit ID [TYPE]`
 
@@ -93,7 +94,7 @@ OPTIONS
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 ```
 
-_See code: [src/commands/edit.ts](https://github.com/rthoyer/binocle/blob/v0.1.6/src/commands/edit.ts)_
+_See code: [src/commands/edit.ts](https://github.com/rthoyer/binocle/blob/v0.2.1/src/commands/edit.ts)_
 
 ## `binocle help [COMMAND]`
 
@@ -110,7 +111,7 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.3.1/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.18/src/commands/help.ts)_
 
 ## `binocle ls [FOLDER_ID]`
 
@@ -142,7 +143,7 @@ EXAMPLE
   |   📁 Folder C #156 (D:1 - L:7)
 ```
 
-_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.1.6/src/commands/ls.ts)_
+_See code: [src/commands/ls.ts](https://github.com/rthoyer/binocle/blob/v0.2.1/src/commands/ls.ts)_
 
 ## `binocle pause CONTENT_ID [TYPE] [USER_ID]`
 
@@ -168,7 +169,7 @@ ALIASES
   $ binocle schedule:pause
 ```
 
-_See code: [src/commands/pause.ts](https://github.com/rthoyer/binocle/blob/v0.1.6/src/commands/pause.ts)_
+_See code: [src/commands/pause.ts](https://github.com/rthoyer/binocle/blob/v0.2.1/src/commands/pause.ts)_
 
 ## `binocle restore ID [TYPE]`
 
@@ -189,5 +190,26 @@ OPTIONS
   -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
 ```
 
-_See code: [src/commands/restore.ts](https://github.com/rthoyer/binocle/blob/v0.1.6/src/commands/restore.ts)_
+_See code: [src/commands/restore.ts](https://github.com/rthoyer/binocle/blob/v0.2.1/src/commands/restore.ts)_
+
+## `binocle share`
+
+Shares a folder and its parents up until the shared/users root folder to a group or a user. It deactivates the inheritance of access levels from parents for all these folders.
+
+```
+USAGE
+  $ binocle share
+
+OPTIONS
+  -c, --client_id=client_id          (required) API3 credential client_id
+  -e, --edit_right                   Shares the folder with edit rights (and parents with view rights)
+  -f, --folder_id=folder_id          (required) API3 credential client_id
+  -g, --is_group                     The provided id is the one of a group, not a user
+  -h, --help                         show CLI help
+  -i, --id=id                        (required) Group or user id
+  -s, --client_secret=client_secret  (required) API3 credential client_id
+  -u, --base_url=base_url            (required) Sets base url like https://my.looker.com:19999
+```
+
+_See code: [src/commands/share.ts](https://github.com/rthoyer/binocle/blob/v0.2.1/src/commands/share.ts)_
 <!-- commandsstop -->
